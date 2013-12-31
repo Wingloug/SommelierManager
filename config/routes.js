@@ -800,6 +800,11 @@ module.exports = function(app, models) {
 		}
 	});
 
+	app.get("/admin_panel", function(req, res) {
+		console.log("auth login");
+		res.render("admin", {title: "Admin"});
+	});
+
 	app.get("*", function(req, res) {
 		res.send(404, "404");
 	});
