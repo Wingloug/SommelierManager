@@ -1,0 +1,20 @@
+{
+	"development": {
+		"username": "admin_prototipo",
+		"password": "admin",
+		"database": "prototipo_dev",
+		"host": "127.0.0.1"
+	},
+	"test": {
+		"username": "admin_prototipo",
+		"password": "admin",
+		"database": "prototipo_test",
+		"host": "127.0.0.1"
+	},
+	"production": {
+		"username": "admin_prototipo",
+		"password": "admin",
+		"database": "prototipo",
+		"host": "127.0.0.1"
+	}
+}

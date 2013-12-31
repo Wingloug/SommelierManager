@@ -1,0 +1,13 @@
+ol.breadcrumb
+	- var i = 0
+	- for (i = 0; i < crumbs.length - 1; i++)
+		li: a(href= crumbs[i].href)= crumbs[i].name
+	-if (i || crumbs.length === 1)
+		li.active= crumbs[i].name
+		- if (children.length)
+			div(style="display: inline; margin-left: 0.5em").dropdown
+				a(data-toggle="dropdown").dropdown-toggle
+					span.caret
+				ul(role="menu", aria-labelledby="childrenDropdown").dropdown-menu
+					- for (var i = 0; i < children.length; i++)
+						li(role="presentation"): a(href= children[i].href, role="menuitem")= children[i].name

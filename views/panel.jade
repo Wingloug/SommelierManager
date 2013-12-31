@@ -1,0 +1,84 @@
+extends layout
+
+block content
+	h1= object.name
+	include _breadcrumbs
+
+	.row
+		.col-md-7
+			.panel.panel-default
+				.panel-heading
+					h3.panel-title Assests
+				.panel-body
+					//- Los contenedores se crean si hay al menos una imagen
+					- if (files.length)
+						- if ((files[0].type === "image") || (files[0].type === "video"))
+							.connected-carousels
+								.stage
+									.carousel.carousel-stage
+										ul
+											- for (var i = 0; i < files.length; i++)
+												- if (files[i].type === "image")
+													li: img(src=files[i].path + files[i].filename)
+												- if (files[i].type === "video")
+													- if (files[i].extension === ".mp4" || files[i].extension === ".webm" || files[i].extension === ".ogg")
+														li: div(style="min-width: 600px; min-height: 400px; text-align: center")
+															video(controls, preload="none", poster="/images/poster.png", style="max-width: 490px; min-width: 490px; margin: auto")
+																source(src=files[i].path + files[i].filename, type="video/" + files[i].extension.substr(1,files[i].extension.length - 1))
+																| El navegador que estás usando no soporta video. Usa Chrome, baby!
+									- for (var i = 0; i < files.length; i++)
+										- if (files[i].type === "image")
+											.photo-credits(class=(files[i].description !== null ? "show_msg": ""))
+												p= (files[i].description !== null ? files[i].description : "")
+									a(href="#").prev.prev-stage
+										span &lsaquo;
+									a(href="#").next.next-stage
+										span &rsaquo;
+								.navigation
+									a(href="#").prev.prev-navigation &lsaquo;
+									a(href="#").next.next-navigation &rsaquo;
+									.carousel.carousel-navigation
+										ul
+											- for (var i = 0; i < files.length; i++)
+												- if (files[i].type === "image")
+													li: img(src=files[i].path + files[i].filename)
+												- if (files[i].type === "video")
+													li: img(src="/images/thumbnail_play.png")
+		.col-md-5
+			.panel.panel-default
+				.panel-heading
+					h3.panel-title Descripción
+				.panel-body
+					=object.description
+					- if (extra.task_description)
+						hr
+						=extra.task_description
+			.panel.panel-default
+				.panel-heading
+					h3.panel-title Archivos
+				.panel-body
+					- for (var i = 0; i < files.length; i++)
+						- if (files[i].type === "audio")
+							.media
+								a(href="/download?path=" + files[i].path + files[i].filename + "&filename=" + files[i].original_filename).pull-left.download_file
+									span.glyphicon.glyphicon-download-alt
+								.media-body
+									h5.media-heading= files[i].original_filename
+									= files[i].description
+									- if (files[i].extension === ".ogg" || files[i].extension === ".mp3" || files[i].extension === ".wav")
+										audio(controls, preload="none")
+											source(src=files[i].path + files[i].filename, type="audio/" + files[i].extension.substr(1,files[i].extension.length - 1))
+											| El navegador que estás usando no soporta audio. Usa Chrome, baby!
+
+						- if (files[i].type === "text" || files[i].type === "other")
+							.media
+								a(href="/download?path=" + files[i].path + files[i].filename + "&filename=" + files[i].original_filename).pull-left.download_file
+									span.glyphicon.glyphicon-download-alt
+								.media-body
+									h5.media-heading= files[i].original_filename
+
+	include _to_do_panel
+
+	link(rel="stylesheet", type="text/css", href="/css/jcarousel.connected-carousels.css")
+	script(src="/js/jcarousel.js",  type="text/javascript", defer)
+	script(src="/js/jcarousel.connected-carousels.js",  type="text/javascript", defer)

@@ -1,0 +1,112 @@
+- if (extra.user_object_id)
+	!= "<script type='text/javascript' id='extra'>"
+	!= "var extra = {};"
+	!= "extra.board_id = " + extra.board_id + ";"
+	!= "extra.user_object_id = " + extra.user_object_id + ";"
+	!= "extra.role = '" + extra.role + "';"
+	!= "extra.task_description = '" + (extra.task_description ? extra.task_description : "") + "';"
+	!= "extra.progress = " + extra.progress + ";"
+	!= "</script>"
+
+//- Si existe un panel para ver
+- if (extra.board_id)
+	.panel.panel-default
+		.panel-heading
+			h3.panel-title To Do
+		.panel-body
+			.row
+				.col-md-4
+					.panel.panel-info
+						.panel-heading To Do
+						.panel-body.board-container
+							- for (var i = 0; i < todo.length; i++)
+								div(draggable="true", id=todo[i].id, class=(todo[i].label ? "alert-" + todo[i].label : "alert-default")).board-item.alert
+									div(style="margin-top: -18px; font-size: 1.3em").labels-container.pull-right
+										a(class="item-label default " + (todo[i].label == "default" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label success " + (todo[i].label == "success" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label info " + (todo[i].label == "info" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label warning " + (todo[i].label == "warning" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label danger " + (todo[i].label == "danger" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										.clearfix
+									p.item-content=todo[i].description
+									p.actions.pull-right
+										button(type="submit", data-target=todo[i].id, class="btn btn-xs btn-primary edit-item", data-toggle="tooltip", title="Editar")
+											span.glyphicon.glyphicon-pencil
+										=" "
+										button(type="button", data-target=todo[i].id, class="btn btn-xs btn-default del-item", data-toggle="tooltip", title="Eliminar")
+											span.glyphicon.glyphicon-trash
+									.clearfix
+						.panel-footer
+							a.add-item.btn.btn-default.btn-sm.pull-right
+								span.glyphicon.glyphicon-plus
+								|  Agregar item
+							.clearfix
+				.col-md-4
+					.panel.panel-info
+						.panel-heading Doing
+						.panel-body.board-container
+							- for (var i = 0; i < doing.length; i++)
+								div(draggable="true", id=doing[i].id, class=(doing[i].label ? "alert-" + doing[i].label : "alert-default")).board-item.alert
+									div(style="margin-top: -18px; font-size: 1.3em").labels-container.pull-right
+										a(class="item-label default " + (doing[i].label == "default" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label success " + (doing[i].label == "success" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label info " + (doing[i].label == "info" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label warning " + (doing[i].label == "warning" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label danger " + (doing[i].label == "danger" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										.clearfix
+									p.item-content=doing[i].description
+									p.actions.pull-right
+										button(type="submit", data-target=doing[i].id, class="btn btn-xs btn-primary edit-item", data-toggle="tooltip", title="Editar")
+											span.glyphicon.glyphicon-pencil
+										=" "
+										button(type="button", data-target=doing[i].id, class="btn btn-xs btn-default del-item", data-toggle="tooltip", title="Eliminar")
+											span.glyphicon.glyphicon-trash
+									.clearfix
+						.panel-footer
+							a.add-item.btn.btn-default.btn-sm.pull-right
+								span.glyphicon.glyphicon-plus
+								|  Agregar item
+							.clearfix
+				.col-md-4
+					.panel.panel-info
+						.panel-heading Done
+						.panel-body.board-container
+							- for (var i = 0; i < done.length; i++)
+								div(draggable="true", id=done[i].id, class=(done[i].label ? "alert-" + done[i].label : "alert-default")).board-item.alert
+									div(style="margin-top: -18px; font-size: 1.3em").labels-container.pull-right
+										a(class="item-label default " + (done[i].label == "default" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label success " + (done[i].label == "success" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label info " + (done[i].label == "info" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label warning " + (done[i].label == "warning" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										a(class="item-label danger " + (done[i].label == "danger" ? "selected" : ""))
+											span(class="glyphicon glyphicon-bookmark")
+										.clearfix
+									p.item-content=done[i].description
+									p.actions.pull-right
+										button(type="submit", data-target=done[i].id, class="btn btn-xs btn-primary edit-item", data-toggle="tooltip", title="Editar")
+											span.glyphicon.glyphicon-pencil
+										=" "
+										button(type="button", data-target=done[i].id, class="btn btn-xs btn-default del-item", data-toggle="tooltip", title="Eliminar")
+											span.glyphicon.glyphicon-trash
+									.clearfix
+						.panel-footer
+							a.add-item.btn.btn-default.btn-sm.pull-right
+								span.glyphicon.glyphicon-plus
+								|  Agregar item
+							.clearfix
+
+	script(src="/js/panel.js", type="text/javascript", defer)

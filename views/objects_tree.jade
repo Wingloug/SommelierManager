@@ -1,0 +1,17 @@
+extends layout
+
+block content
+	h1= title
+	p #{project_name}
+	include _breadcrumbs
+
+	div
+		- for (var i = 0; i <objects.length; i++)
+			div(id=objects[i].id + "_container")
+				a(href="#", id=objects[i].id).obj_expand
+					i.icon.triangle_right-icon
+				a(href=path + "panel/" + objects[i].id)= objects[i].name
+
+	script(src="/js/cookies.js")
+	script(src="/js/html_object.js", defer)
+	script(src="/js/objects.js", defer)
