@@ -805,7 +805,85 @@ module.exports = function(app, models) {
 		res.render("admin", {title: "Admin"});
 	});
 
+	app.get("/admin_panel/users", function(req, res) {
+		console.log("auth login");
+		var users = [];
+		models.User.findAll().success(function(response) {
+			for (var i = 0; i < response.length; i++) {
+				users[i] = {
+					id: response[i].id,
+					username: response[i].username,
+					email: response[i].email,
+					name: response[i].name,
+					last_name: response[i].last_name,
+					role: response[i].role
+				}
+			}
+			res.render("users", {title: "Administración - Usuarios", users: users});
+		}).error(function(err) {
+			console.log(err);
+			res.render("users", {title: "Administración - Usuarios", users: users});
+		});
+	});
+
+	app.get("/admin_panel/users/new", function(req, res) {
+		console.log("auth login");
+		var roles = [];
+		roles[0] = "admin";
+		roles[1] = "user";
+
+		var crumbs = []
+		crumbs[0] = {
+			name: "Administración",
+			href: "/admin_panel"
+		}
+
+		crumbs[1] = {
+			name: "Usuarios",
+			href:"/admin_panel/users/"
+		}
+
+		crumbs[2] = {
+			name: "Nuevo usuario",
+			href: "/admin_panel/new"
+		}
+		res.render("user_form", {title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], user: {}, roles: roles});
+	});
+
+	app.post("/admin_panel/users/new", function(req, res) {
+		// username, password, email, name, last_name, rol
+		if (!check_username(req.body.username)) {
+			res.send(202, "Username already used");
+		}
+
+		if (!check_password(req.body.password, req.body.password_repeat)) {
+			res.send(202, "Password doesn't match");
+		}
+
+		res.send(200, req.body);
+
+	});
+
 	app.get("*", function(req, res) {
 		res.send(404, "404");
 	});
+
+	function check_username(username) {
+		models.User.find({
+			where: {
+				username: username
+			}
+		}).success(function(user) {
+			if (!user) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		})
+	}
+
+	function check_password(password, password_repeat) {
+		return password === password_repeat;
+	}
 };

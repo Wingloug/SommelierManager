@@ -1,9 +1,9 @@
-extends layout
+extends layout/layout
 
 block content
 	h1= title
 	p #{project_name}
-	include _breadcrumbs
+	include layout/_breadcrumbs
 
 	div
 		- for (var i = 0; i <objects.length; i++)

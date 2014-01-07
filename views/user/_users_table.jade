@@ -1,0 +1,16 @@
+table.table.table-stripped.table-bordered.table-hover
+	thead
+		tr
+			th Nombre de usuario
+			th Email
+			th Nombre
+			th Apellido
+			th Rol
+	tbody
+		- for (var i = 0; i < users.length; i++)
+			tr
+				td= users[i].username
+				td= users[i].email
+				td= users[i].name
+				td= users[i].last_name
+				td= users[i].role

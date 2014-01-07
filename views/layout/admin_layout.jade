@@ -1,0 +1,19 @@
+doctype 5
+html
+	head
+		title= title
+		meta(name="viewport", content="width=device-width, initial-scale=1.0")
+		link(rel='stylesheet', href='/css/bootstrap.css')
+		link(rel='stylesheet', href='/stylesheets/main.css')
+		script(src="/js/jquery.js",  type="text/javascript", defer)
+		script(src="/js/bootstrap.js",  type="text/javascript", defer)
+
+	body
+		include _header
+		.container
+			.row
+				.col-md-2
+					include _left_menu
+				.col-md-10
+					.row
+						block content

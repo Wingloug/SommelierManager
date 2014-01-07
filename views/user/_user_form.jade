@@ -1,0 +1,39 @@
+//- user = {username, password}
+
+form(role="form", method="post").form-horizontal
+	.form-group
+		label(for="username").control-label.col-md-3 Nombre de usuario
+		.col-md-5
+			input(id="username", placeholder="Nombre de usuario", type="text", name="username", value=(user.username ? user.username : ""), required=true).form-control
+	- if (!user.username)
+		.form-group
+			label(for="password").control-label.col-md-3 Contraseña
+			.col-md-5
+				input(id="password", placeholder="Contraseña", type="password", name="password", required=true).form-control
+		.form-group
+			label(for="password_repeat").control-label.col-md-3 Repetir Contraseña
+			.col-md-5
+				input(id="password_repeat", placeholder="Repetir Contraseña", type="password", name="password_repeat", required=true).form-control
+	.form-group
+		label(for="email").control-label.col-md-3 Email
+		.col-md-5
+			input(id="email", placeholder="Email", type="email", name="email", value=(user.email ? user.email : "")).form-control
+	.form-group
+		label(for="name").control-label.col-md-3 Nombre
+		.col-md-5
+			input(id="name", placeholder="Nombre", type="text", name="name", value=(user.name ? user.name : "")).form-control
+	.form-group
+		label(for="last_name").control-label.col-md-3 Apellido
+		.col-md-5
+			input(id="last_name", placeholder="Apellido", type="text", name="last_name", value=(user.last_name ? user.last_name : "")).form-control
+	.form-group
+		label(for="role").control-label.col-md-3 Rol
+		.col-md-5
+			select(id="role", name="role").form-control
+				- for (var i = 0; i < roles.length ; i++)
+					option(selected=((user.rol ? ((user.rol == roles[i]) ? true : false) : (i == 1 ? true : false))), value=i)= roles[i]
+	.form-group
+		.col-md-offset-3.col-md-5
+			button(type="submit").btn.btn-primary Guardar
+			&nbsp;
+			a(href="/admin_panel/users") Cancelar
