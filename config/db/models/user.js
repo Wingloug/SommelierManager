@@ -1,5 +1,6 @@
 module.exports = function(sequelize, DataTypes) {
 	// Usuarios de la plataforma. Pueden crear proyectos y objetos.
+	var bcrypt = require('bcrypt');
 
 	var model =  sequelize.define('user', {
 		id: {
@@ -40,14 +41,23 @@ module.exports = function(sequelize, DataTypes) {
 	model.saveRecord = function(object, callback) {
 		var temp = model.build(object);
 
-		temp.save().success(function() {
-			if (callback) {
-				callback();
+		temp.username = temp.username.toLowerCase();
+
+		bcrypt.hash(object.password, 8, function(err, hash) {
+			if (err) {
+				callback(null, err);
 			}
-		}).error(function() {
-			if (callback) {
-				callback();
-			}
+
+			temp.password = hash;
+			temp.save().success(function(user) {
+				if (callback) {
+					callback(user);
+				}
+			}).error(function(err) {
+				if (callback) {
+					callback(err);
+				}
+			});
 		});
 	}
 

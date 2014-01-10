@@ -3,6 +3,7 @@ module.exports = function(app, express) {
 	var nib = require("nib");
 	var Sequelize = require("sequelize");
 	var uuid = require("node-uuid");
+	var flash = require('connect-flash');
 
 	function compile(str, path) {
 		console.log("compile " + path);
@@ -34,6 +35,7 @@ module.exports = function(app, express) {
 			compile: compile
 		}));
 		app.use(express.static(app.root + '/public'));
+		app.use(flash());
 		app.use(app.router);
 		app.use(express.errorHandler());
 	});
@@ -49,6 +51,7 @@ module.exports = function(app, express) {
 		app.use(express.session());
 		var oneYear = 31557600000;
 		app.use(express.static(app.root + '/public'), { maxAge: oneYear });
+		app.use(flash());
 		app.use(app.router);
 		app.use(express.methodOverride());
 		app.use(express.errorHandler());

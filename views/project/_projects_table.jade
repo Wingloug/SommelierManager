@@ -1,0 +1,17 @@
+table.table.table-stripped.table-bordered.table-hover#projects
+	thead
+		tr
+			th Nombre
+			th Progreso
+			th Estado
+			th Creado por
+	tbody
+		- for (var i = 0; i < projects.length; i++)
+			tr
+				td= projects[i].name
+				td
+					small= projects[i].progress + " %"
+					.progress
+						div(id="progress_" + projects[i].id role="progressbar", aria-valuenow= projects[i].progress, aria-valuemin="0", aria-valuemax="100", style="width: " + projects[i].progress + "%").progress-bar.progress-bar-info
+				td= projects[i].status
+				td(data-user=projects[i].created_by)= projects[i].username

@@ -1,0 +1,56 @@
+- if (flash.info || flash.error || flash.success || flash.warning)
+	- var type = ""
+	- var content = ""
+	- if (flash.info)
+		- type = "alert-info"
+		- if (flash.info instanceof Array ) {
+			- for (var i in flash.info) {
+				- content += flash.info[i] + "<br />"
+			- }
+		- } else  {
+			- content = flash.info
+		- }
+		div(class="alert alert-dismissable " + type)
+			button(type="button", data-dismiss="alert", aria-hidden="true").close &times;
+			!= content
+
+	- if (flash.error)
+		- type = "alert-danger"
+		- if (flash.error instanceof Array ) {
+			- for (var i in flash.error) {
+				- content += flash.error[i] + "<br />"
+			- }
+		- } else  {
+			- content = flash.error
+		- }
+		div(class="alert alert-dismissable " + type)
+			button(type="button", data-dismiss="alert", aria-hidden="true").close &times;
+			!= content
+
+	- if (flash.success)
+		-type = "alert-success"
+		- if (flash.success instanceof Array ) {
+			- for (var i in flash.success) {
+				- content += flash.success[i] + "<br />"
+			- }
+		- } else  {
+			- content = flash.success
+		- }
+		div(class="alert alert-dismissable " + type)
+			button(type="button", data-dismiss="alert", aria-hidden="true").close &times;
+			!= content
+
+	- if (flash.warning)
+		- type = "alert-warning"
+		- if (flash.warning instanceof Array ) {
+			- for (var i in flash.warning) {
+				- content += flash.warning[i] + "<br />"
+			- }
+		- } else  {
+			- content = flash.warning
+		- }
+		div(class="alert alert-dismissable " + type)
+			button(type="button", data-dismiss="alert", aria-hidden="true").close &times;
+			!= content
+
+

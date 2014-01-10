@@ -1,0 +1,11 @@
+extends layout/admin_layout
+
+block content
+	h2 Sommelier Manager
+
+	p.pull-right
+		a(href="/admin_panel/projects/new")
+			i.glyphicon.glyphicon-plus Agregar
+	include project/_projects_table
+
+	script(src="/js/admin_projects.js", type="text/javascript", async)

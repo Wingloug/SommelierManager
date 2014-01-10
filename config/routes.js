@@ -819,18 +819,18 @@ module.exports = function(app, models) {
 					role: response[i].role
 				}
 			}
-			res.render("users", {title: "Administración - Usuarios", users: users});
+			res.render("admin_users", {title: "Administración - Usuarios", users: users});
 		}).error(function(err) {
 			console.log(err);
-			res.render("users", {title: "Administración - Usuarios", users: users});
+			res.render("admin_users", {title: "Administración - Usuarios", users: users});
 		});
 	});
 
 	app.get("/admin_panel/users/new", function(req, res) {
 		console.log("auth login");
 		var roles = [];
-		roles[0] = "admin";
-		roles[1] = "user";
+		roles[0] = "Administrador";
+		roles[1] = "Usuario";
 
 		var crumbs = []
 		crumbs[0] = {
@@ -845,42 +845,114 @@ module.exports = function(app, models) {
 
 		crumbs[2] = {
 			name: "Nuevo usuario",
-			href: "/admin_panel/new"
+			href: "/admin_panel/users/new"
 		}
-		res.render("user_form", {title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], user: {}, roles: roles});
+
+		res.render("user_form", { title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], user: {}, roles: roles, flash: req.flash() });
 	});
 
 	app.post("/admin_panel/users/new", function(req, res) {
-		// username, password, email, name, last_name, rol
-		if (!check_username(req.body.username)) {
-			res.send(202, "Username already used");
+		// username, password, password_repeat, email, name, last_name, rol
+		var errors = [];
+		check_username(req.body.username, function(disponible) {
+			if (!disponible) {
+				req.flash("error", "Nombre de usuario no disponible");
+				errors.push("username");
+			}
+			if (!check_password(req.body.password, req.body.password_repeat)) {
+				req.flash("error", "La contraseña y su confimación no coinciden");
+				errors.push("password");
+			}
+
+			if (!errors.length) {
+				var user = {
+					username: req.body.username,
+					password: req.body.password,
+					email: req.body.email,
+					name: req.body.name,
+					last_name: req.body.last_name,
+					rol: req.body.rol
+				}
+
+				models.User.saveRecord(user, function(res, err) {
+					if (err) {
+						req.flash("error", "No fue posible crear el usuario. Inténtelo nuevamente");
+					}
+					else {
+						req.flash("success", "Usuario creado correctamente");
+					}
+					res.redirect("/admin_panel/users/new");
+				});
+			}
+			else {
+				res.redirect("/admin_panel/users/new");
+			}
+		});
+	});
+
+	app.get("/admin_panel/projects", function(req, res) {
+		console.log("auth login");
+		models.Project.findAll().success(function(projects) {
+			res.render("admin_projects", {title: "Administración - Proyectos", projects: projects});
+		}).error(function(err) {
+			console.log(err);
+			res.render("admin_projects", {title: "Administración - Proyectos", projects: projects});
+		});
+	});
+
+	app.get("/admin_panel/projects/new", function(req, res) {
+		console.log("auth login");
+		var statuses = [];
+		statuses[0] = "Activo";
+		statuses[1] = "Pausado";
+		statuses[2] = "Completado";
+
+		var crumbs = []
+		crumbs[0] = {
+			name: "Administración",
+			href: "/admin_panel"
 		}
 
-		if (!check_password(req.body.password, req.body.password_repeat)) {
-			res.send(202, "Password doesn't match");
+		crumbs[1] = {
+			name: "Projectos",
+			href:"/admin_panel/projects/"
 		}
 
-		res.send(200, req.body);
+		crumbs[2] = {
+			name: "Nuevo proyecto",
+			href: "/admin_panel/projects/new"
+		}
 
+		res.render("project_form", { title: "Administración - Crear Nuevo Proyecto", crumbs: crumbs, children: [], project: {}, statuses: statuses, flash: req.flash() });
+	});
+
+	app.post("/username/:id", function(req, res) {
+		console.log(req.params.id);
+		models.User.find(req.params.id).success(function(user) {
+			res.send(200, user.username);
+		}).error(function(err) {
+			res.send(202, err);
+		})
 	});
 
 	app.get("*", function(req, res) {
 		res.send(404, "404");
 	});
 
-	function check_username(username) {
+	function check_username(username, callback) {
 		models.User.find({
 			where: {
-				username: username
+				username: username.toLowerCase()
 			}
 		}).success(function(user) {
 			if (!user) {
-				return true;
+				console.log("usuario disponible");
+				callback(true);
 			}
 			else {
-				return false;
+				callback(false);
 			}
-		})
+		});
 	}
 
 	function check_password(password, password_repeat) {
