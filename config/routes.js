@@ -926,6 +926,26 @@ module.exports = function(app, models) {
 		res.render("project_form", { title: "Administración - Crear Nuevo Proyecto", crumbs: crumbs, children: [], project: {}, statuses: statuses, flash: req.flash() });
 	});
 
+	app.post("/admin_panel/projects/new", function(req, res) {
+		// name, progress, status
+
+		var project = {
+			name: req.body.name,
+			progress: req.body.progress,
+			status: req.body.status,
+		}
+
+		models.Project.saveRecord(project, function(res, err) {
+			if (err) {
+				req.flash("error", "No fue posible crear el proyecto. Inténtelo nuevamente");
+			}
+			else {
+				req.flash("success", "Proyecto creado correctamente");
+			}
+			res.redirect("/admin_panel/projects/new");
+		});
+	});
+
 	app.post("/username/:id", function(req, res) {
 		console.log(req.params.id);
 		models.User.find(req.params.id).success(function(user) {

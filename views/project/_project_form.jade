@@ -4,6 +4,7 @@ form(role="form", method="post", action="/admin_panel/projects/new").form-horizo
 		label(for="name").control-label.col-md-3 Nombre
 		.col-md-5
 			input(id="name", placeholder="Nombre", type="text", name="name", value=(project.name ? project.name : "")).form-control
+
 	.form-group
 		label(for="progress").control-label.col-md-3 Progreso (%)
 		.col-md-5
@@ -11,12 +12,14 @@ form(role="form", method="post", action="/admin_panel/projects/new").form-horizo
 			- if (project.progress)
 				.progress
 					div(id="progress_" + projects[i].id role="progressbar", aria-valuenow= project.progress, aria-valuemin="0", aria-valuemax="100", style="width: " + projects.progress + "%").progress-bar.progress-bar-info
+
 	.form-group
 		label(for="role").control-label.col-md-3 Estado
 		.col-md-5
 			select(id="role", name="role").form-control
 				- for (var i = 0; i < statuses.length ; i++)
 					option(selected=((project.status ? ((project.status == statuses[i]) ? true : false) : (i == 0 ? true : false))), value=i)= statuses[i]
+
 	.form-group
 		.col-md-offset-3.col-md-5
 			button(type="submit").btn.btn-primary Guardar
