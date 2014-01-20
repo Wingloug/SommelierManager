@@ -5,11 +5,11 @@ form(role="form", method="post", action="/admin_panel/projects/new").form-horizo
 		.col-md-5
 			input(id="name", placeholder="Nombre", type="text", name="name", value=(project.name ? project.name : "")).form-control
 
-	.form-group
-		label(for="progress").control-label.col-md-3 Progreso (%)
-		.col-md-5
-			input(id="progress", type="number", min="0", max="100", name="progress", value=(project.progress ? project.progress : "0")).form-control
-			- if (project.progress)
+	-if (project.progress)
+		.form-group
+			label(for="progress").control-label.col-md-3 Progreso (%)
+			.col-md-5
+				input(id="progress", type="number", min="0", max="100", name="progress", value=project.progress, width="4.8em").form-control
 				.progress
 					div(id="progress_" + projects[i].id role="progressbar", aria-valuenow= project.progress, aria-valuemin="0", aria-valuemax="100", style="width: " + projects.progress + "%").progress-bar.progress-bar-info
 
@@ -19,6 +19,12 @@ form(role="form", method="post", action="/admin_panel/projects/new").form-horizo
 			select(id="role", name="role").form-control
 				- for (var i = 0; i < statuses.length ; i++)
 					option(selected=((project.status ? ((project.status == statuses[i]) ? true : false) : (i == 0 ? true : false))), value=i)= statuses[i]
+
+	.form-group
+		label(for="users").control-label.col-md-3 Usuarios
+		.col-md-5
+			input(id="users" type="text").form-control
+			.help-block Usuarios que tendrán acceso a ver los objetos del proyecto
 
 	.form-group
 		.col-md-offset-3.col-md-5

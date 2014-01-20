@@ -1,16 +1,35 @@
-table.table.table-stripped.table-bordered.table-hover
-	thead
-		tr
-			th Nombre de usuario
-			th Email
-			th Nombre
-			th Apellido
-			th Rol
-	tbody
-		- for (var i = 0; i < users.length; i++)
+#users
+	div(style="margin-bottom: 0.8em").form-inline
+		input(type="text", placeholder="Buscar", style="width: 12em; margin-right: 0.4em").search.form-control
+		button(type="button").btn.btn-default Limpiar
+	table.table.table-stripped.table-bordered.table-hover
+		thead
 			tr
-				td= users[i].username
-				td= users[i].email
-				td= users[i].name
-				td= users[i].last_name
-				td= users[i].role
+				th Nombre de usuario
+					div.sorters
+						a(class="sortAsc", data-sort="username")
+							span.glyphicon.glyphicon-chevron-up
+						a(class="sortDesc", data-sort="username")
+							span.glyphicon.glyphicon-chevron-down
+				th Email
+					div.sorters
+						a(class="sortAsc", data-sort="email")
+							span.glyphicon.glyphicon-chevron-up
+						a(class="sortDesc", data-sort="email")
+							span.glyphicon.glyphicon-chevron-down
+				th Nombre
+				th Apellido
+				th Rol
+					div.sorters
+						a(class="sortAsc", data-sort="role")
+							span.glyphicon.glyphicon-chevron-up
+						a(class="sortDesc", data-sort="role")
+							span.glyphicon.glyphicon-chevron-down
+		tbody.list
+			- for (var i = 0; i < users.length; i++)
+				tr
+					td(class="username")= users[i].username
+					td(class="email")= users[i].email
+					td= users[i].name
+					td= users[i].last_name
+					td(class="role")= users[i].role

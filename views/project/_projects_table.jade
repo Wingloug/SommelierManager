@@ -1,17 +1,41 @@
-table.table.table-stripped.table-bordered.table-hover#projects
-	thead
-		tr
-			th Nombre
-			th Progreso
-			th Estado
-			th Creado por
-	tbody
-		- for (var i = 0; i < projects.length; i++)
+#projects
+	div(style="margin-bottom: 0.8em").form-inline
+		input(type="text", placeholder="Buscar", style="width: 12em; margin-right: 0.4em").search.form-control
+		button(type="button").btn.btn-default Limpiar
+	table.table.table-stripped.table-bordered.table-hover#projects_table
+		thead
 			tr
-				td= projects[i].name
-				td
-					small= projects[i].progress + " %"
-					.progress
-						div(id="progress_" + projects[i].id role="progressbar", aria-valuenow= projects[i].progress, aria-valuemin="0", aria-valuemax="100", style="width: " + projects[i].progress + "%").progress-bar.progress-bar-info
-				td= projects[i].status
-				td(data-user=projects[i].created_by)= projects[i].username
+				th Nombre
+					div.sorters
+						a(class="sortAsc", data-sort="name")
+							span.glyphicon.glyphicon-chevron-up
+						a(class="sortDesc", data-sort="name")
+							span.glyphicon.glyphicon-chevron-down
+				th Progreso
+					div.sorters
+						a(class="sortAsc", data-sort="progreso")
+							span.glyphicon.glyphicon-chevron-up
+						a(class="sortDesc", data-sort="progreso")
+							span.glyphicon.glyphicon-chevron-down
+				th Estado
+					div.sorters
+						a(class="sortAsc", data-sort="status")
+							span.glyphicon.glyphicon-chevron-up
+						a(class="sortDesc", data-sort="status")
+							span.glyphicon.glyphicon-chevron-down
+				th Creado por
+					div.sorters
+						a(class="sortAsc", data-sort="username")
+							span.glyphicon.glyphicon-chevron-up
+						a(class="sortDesc", data-sort="username")
+							span.glyphicon.glyphicon-chevron-down
+		tbody.list
+			- for (var i = 0; i < projects.length; i++)
+				tr
+					td: a(href="/admin_panel/projects/" + projects[i].id, class="name")= projects[i].name
+					td
+						small(class="progreso")= projects[i].progress + " %"
+						.progress
+							div(id="progress_" + projects[i].id role="progressbar", aria-valuenow= projects[i].progress, aria-valuemin="0", aria-valuemax="100", style="width: " + projects[i].progress + "%").progress-bar.progress-bar-info
+					td(class="status")= projects[i].status
+					td(class="username", data-user=projects[i].created_by)= projects[i].username

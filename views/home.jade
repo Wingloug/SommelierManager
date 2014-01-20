@@ -10,12 +10,13 @@ html
 
 	body
 		.container
-		form(role="form", ).form-signin
+		form(role="form", method="post").form-signin
 			h2 Prototipo - Home
 			input(type="text", placeholder="Email / Nombre de usuario", id="input_username_email", name="email-username", required, autofocus).form-control
 			input(type="password", placeholder="Contraseña" id="input_password", name="password", required).form-control
 			label.checkbox
 				input(type="checkbox")
 				| Recordarme
-			button(type="submit").btn.btn-lg.btn-block.btn-primary Iniciar Sesión
+			//- button(type="submit").btn.btn-lg.btn-block.btn-primary Iniciar Sesión
+			a(href="/admin_panel").btn.btn-lg.btn-block.btn-primary Iniciar Sesión
 

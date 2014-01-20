@@ -802,27 +802,28 @@ module.exports = function(app, models) {
 
 	app.get("/admin_panel", function(req, res) {
 		console.log("auth login");
-		res.render("admin", {title: "Admin"});
+		res.render("admin", {title: "Administración"});
 	});
 
 	app.get("/admin_panel/users", function(req, res) {
 		console.log("auth login");
 		var users = [];
-		models.User.findAll().success(function(response) {
-			for (var i = 0; i < response.length; i++) {
+		models.User.findAll().success(function(records) {
+			for (var i = 0; i < records.length; i++) {
 				users[i] = {
-					id: response[i].id,
-					username: response[i].username,
-					email: response[i].email,
-					name: response[i].name,
-					last_name: response[i].last_name,
-					role: response[i].role
+					id: records[i].id,
+					username: records[i].username,
+					email: records[i].email,
+					name: records[i].name,
+					last_name: records[i].last_name,
+					role: records[i].role
 				}
 			}
-			res.render("admin_users", {title: "Administración - Usuarios", users: users});
+			res.render("admin_users", {title: "Administración - Usuarios", users: users, flash: req.flash() });
 		}).error(function(err) {
 			console.log(err);
-			res.render("admin_users", {title: "Administración - Usuarios", users: users});
+			req.flash("error", err);
+			res.render("admin_users", {title: "Administración - Usuarios", users: users, flash: req.flash() });
 		});
 	});
 
@@ -874,11 +875,11 @@ module.exports = function(app, models) {
 					rol: req.body.rol
 				}
 
-				models.User.saveRecord(user, function(res, err) {
+				models.User.saveRecord(user, function(record, err) {
 					if (err) {
 						req.flash("error", "No fue posible crear el usuario. Inténtelo nuevamente");
 					}
-					else {
+					else if (record){
 						req.flash("success", "Usuario creado correctamente");
 					}
 					res.redirect("/admin_panel/users/new");
@@ -893,10 +894,11 @@ module.exports = function(app, models) {
 	app.get("/admin_panel/projects", function(req, res) {
 		console.log("auth login");
 		models.Project.findAll().success(function(projects) {
-			res.render("admin_projects", {title: "Administración - Proyectos", projects: projects});
+			res.render("admin_projects", {title: "Administración - Proyectos", projects: projects, flash: req.flash() });
 		}).error(function(err) {
 			console.log(err);
-			res.render("admin_projects", {title: "Administración - Proyectos", projects: projects});
+			req.flash("error", err);
+			res.render("admin_projects", {title: "Administración - Proyectos", projects: projects, flash: req.flash() });
 		});
 	});
 
@@ -914,7 +916,7 @@ module.exports = function(app, models) {
 		}
 
 		crumbs[1] = {
-			name: "Projectos",
+			name: "Proyectos",
 			href:"/admin_panel/projects/"
 		}
 
@@ -935,7 +937,7 @@ module.exports = function(app, models) {
 			status: req.body.status,
 		}
 
-		models.Project.saveRecord(project, function(res, err) {
+		models.Project.saveRecord(project, function(record, err) {
 			if (err) {
 				req.flash("error", "No fue posible crear el proyecto. Inténtelo nuevamente");
 			}
@@ -946,8 +948,56 @@ module.exports = function(app, models) {
 		});
 	});
 
+	app.get("/admin_panel/projects/:id", function(req, res) {
+		console.log("auth login");
+		var statuses = [];
+
+		var crumbs = []
+		crumbs[0] = {
+			name: "Administración",
+			href: "/admin_panel"
+		}
+
+		crumbs[1] = {
+			name: "Proyectos",
+			href:"/admin_panel/projects/"
+		}
+
+		crumbs[2] = {
+			name: "Detalle proyecto",
+			href: "/admin_panel/projects/" + req.params.id
+		}
+
+
+		models.Project.find(req.params.id).success(function(project) {
+			models.UserProject.findAll({ where: { project_id: req.params.id } }).success(function(user_projects) {
+				var ids = []
+				for (var i = 0; i < user_projects.length; i++) {
+					ids[i] = user_projects[i].user_id;
+				}
+
+				ids[i] = project.created_by;
+
+				models.User.findAll({ where: { id: ids } }).success(function(users) {
+					res.render("project_details", { title: "Administración - Detalle proyecto", crumbs: crumbs, children: [], project: project, users: users, flash: req.flash });
+				}).error(function(err) {
+					console.log(err);
+					req.flash("error", "Operación no realizada. Inténtelo nuevamente");
+					res.redirect("admin_panel/projects");
+				});
+			}).error(function(err) {
+				console.log(err);
+				req.flash("error", "Operación no realizada. Inténtelo nuevamente");
+				res.redirect("admin_panel/projects");
+			});
+		}).error(function(err) {
+			console.log(err);
+			req.flash("error", "Operación no realizada. Inténtelo nuevamente");
+			res.redirect("admin_panel/projects");
+		})
+	});
+
 	app.post("/username/:id", function(req, res) {
-		console.log(req.params.id);
 		models.User.find(req.params.id).success(function(user) {
 			res.send(200, user.username);
 		}).error(function(err) {

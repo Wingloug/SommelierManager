@@ -19,6 +19,11 @@
 .item-label.danger{color:#ebccd1;}
 .item-label.danger:hover{color:#a94442}
 .item-label.danger.selected{color:#a94442}
+.sorters{display:inline-block;width:12px;font-size:.7em;margin-left:.8em;margin-bottom:0;vertical-align:top;}
+.sorters a{height:10px;position:relative;display:block;text-align:left;color:#ccc;}
+.sorters a.active{color:#428bca}
+.sorters a:first-child{margin-top:-2px}
+.sorters a:last-child{margin-left:-1px}
 .icon{width:24px;height:24px;line-height:24px;display:inline-block;vertical-align:middle;background-repeat:no-repeat;background-image:url("../images/icons/icons.png");background-size:28px 52px;margin-right:.4em;}
 .triangle_right-icon{background-position:0 0}
 .triangle_down-icon{background-position:0 -28px}
