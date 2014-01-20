@@ -2,7 +2,7 @@ module.exports = {
 	up: function(migration, DataTypes, done) {
 		// add altering commands here, calling 'done' when finished
 		migration.addColumn("users", "email", {
-			type: DataTypes.INTEGER.UNSIGNED,
+			type: DataTypes.STRING,
 			allowNull: true,
 			defaultValue: ""
 		});
