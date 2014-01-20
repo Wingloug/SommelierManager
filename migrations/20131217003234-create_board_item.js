@@ -5,8 +5,7 @@ module.exports = {
 			id: {
 				type: DataTypes.INTEGER.UNSIGNED,
 				primaryKey: true,
-				autoIncrement: true,
-				defaultValue: DataTypes.INTEGER.UNSIGNED.ZERO
+				autoIncrement: true
 			},
 			board_id: {
 				type: DataTypes.INTEGER.UNSIGNED,

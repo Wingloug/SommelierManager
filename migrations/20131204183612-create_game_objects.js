@@ -5,8 +5,7 @@ module.exports = {
 			id: {
 				type: DataTypes.INTEGER.UNSIGNED,
 				primaryKey: true,
-				autoIncrement: true,
-				defaultValue: DataTypes.INTEGER.UNSIGNED.ZERO
+				autoIncrement: true
 			},
 			name: {
 				type: DataTypes.STRING,
@@ -15,6 +14,7 @@ module.exports = {
 			description: {
 				type: DataTypes.TEXT,
 				allowNull: true,
+				defaultValue: ""
 			},
 			parent_id: {
 				type: DataTypes.INTEGER.UNSIGNED,

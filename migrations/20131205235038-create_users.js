@@ -5,8 +5,7 @@ module.exports = {
 			id: {
 				type: DataTypes.INTEGER.UNSIGNED,
 				primaryKey: true,
-				autoIncrement: true,
-				defaultValue: DataTypes.INTEGER.UNSIGNED.ZERO
+				autoIncrement: true
 			},
 			username: {
 				type: DataTypes.STRING,
@@ -20,6 +19,7 @@ module.exports = {
 			email: {
 				type: DataTypes.STRING,
 				allowNull: true,
+				defaultValue: ""
 			}
 			name: {
 				type: DataTypes.STRING,

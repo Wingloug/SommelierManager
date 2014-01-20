@@ -3,7 +3,8 @@ module.exports = {
 		// add altering commands here, calling 'done' when finished
 		migration.addColumn("users", "email", {
 			type: DataTypes.INTEGER.UNSIGNED,
-			allowNull: true
+			allowNull: true,
+			defaultValue: ""
 		});
 		done()
 	},

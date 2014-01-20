@@ -5,8 +5,7 @@ module.exports = {
 			id: {
 				type: DataTypes.INTEGER.UNSIGNED,
 				primaryKey: true,
-				autoIncrement: true,
-				defaultValue: DataTypes.INTEGER.UNSIGNED.ZERO
+				autoIncrement: true
 			},
 			name: {
 				type: DataTypes.STRING,
@@ -15,7 +14,7 @@ module.exports = {
 			},
 			progress: {
 				type: DataTypes.FLOAT.UNSIGNED,
-				defaultValue: DataTypes.FLOAT.UNSIGNED.ZERO
+				defaultValue: 0
 			},
 			status: {
 				type: DataTypes.ENUM,
