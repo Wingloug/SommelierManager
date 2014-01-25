@@ -802,7 +802,7 @@ module.exports = function(app, models) {
 
 	app.get("/admin_panel", function(req, res) {
 		console.log("auth login");
-		res.render("admin", {title: "Administración"});
+		res.render("admin", {title: "Administración", active: 0});
 	});
 
 	app.get("/admin_panel/users", function(req, res) {
@@ -819,11 +819,11 @@ module.exports = function(app, models) {
 					role: records[i].role
 				}
 			}
-			res.render("admin_users", {title: "Administración - Usuarios", users: users, flash: req.flash() });
+			res.render("admin_users", {title: "Administración - Usuarios", users: users, flash: req.flash(), active: 1 });
 		}).error(function(err) {
 			console.log(err);
 			req.flash("error", err);
-			res.render("admin_users", {title: "Administración - Usuarios", users: users, flash: req.flash() });
+			res.render("admin_users", {title: "Administración - Usuarios", users: users, flash: req.flash(), active: 1 });
 		});
 	});
 
@@ -849,7 +849,7 @@ module.exports = function(app, models) {
 			href: "/admin_panel/users/new"
 		}
 
-		res.render("user_form", { title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], user: {}, roles: roles, flash: req.flash() });
+		res.render("user_form", { title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], user: {}, roles: roles, flash: req.flash(), active: 1 });
 	});
 
 	app.post("/admin_panel/users/new", function(req, res) {
@@ -894,11 +894,11 @@ module.exports = function(app, models) {
 	app.get("/admin_panel/projects", function(req, res) {
 		console.log("auth login");
 		models.Project.findAll().success(function(projects) {
-			res.render("admin_projects", {title: "Administración - Proyectos", projects: projects, flash: req.flash() });
+			res.render("admin_projects", {title: "Administración - Proyectos", projects: projects, flash: req.flash(), active: 2 });
 		}).error(function(err) {
 			console.log(err);
 			req.flash("error", err);
-			res.render("admin_projects", {title: "Administración - Proyectos", projects: projects, flash: req.flash() });
+			res.render("admin_projects", {title: "Administración - Proyectos", projects: projects, flash: req.flash(), active: 2 });
 		});
 	});
 
@@ -925,7 +925,7 @@ module.exports = function(app, models) {
 			href: "/admin_panel/projects/new"
 		}
 
-		res.render("project_form", { title: "Administración - Crear Nuevo Proyecto", crumbs: crumbs, children: [], project: {}, statuses: statuses, flash: req.flash() });
+		res.render("project_form", { title: "Administración - Crear Nuevo Proyecto", crumbs: crumbs, children: [], project: {}, statuses: statuses, flash: req.flash(), active: 2 });
 	});
 
 	app.post("/admin_panel/projects/new", function(req, res) {
@@ -979,7 +979,7 @@ module.exports = function(app, models) {
 				ids[i] = project.created_by;
 
 				models.User.findAll({ where: { id: ids } }).success(function(users) {
-					res.render("project_details", { title: "Administración - Detalle proyecto", crumbs: crumbs, children: [], project: project, users: users, flash: req.flash });
+					res.render("project_details", { title: "Administración - Detalle proyecto", crumbs: crumbs, children: [], project: project, users: users, flash: req.flash, active: 2 });
 				}).error(function(err) {
 					console.log(err);
 					req.flash("error", "Operación no realizada. Inténtelo nuevamente");

@@ -24,6 +24,7 @@
 .sorters a.active{color:#428bca}
 .sorters a:first-child{margin-top:-2px}
 .sorters a:last-child{margin-left:-1px}
+.nav-pills > li > a{border:1px solid #eee}
 .icon{width:24px;height:24px;line-height:24px;display:inline-block;vertical-align:middle;background-repeat:no-repeat;background-image:url("../images/icons/icons.png");background-size:28px 52px;margin-right:.4em;}
 .triangle_right-icon{background-position:0 0}
 .triangle_down-icon{background-position:0 -28px}
