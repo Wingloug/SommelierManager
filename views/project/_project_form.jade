@@ -23,7 +23,9 @@ form(role="form", method="post", action="/admin_panel/projects/new").form-horizo
 	.form-group
 		label(for="users").control-label.col-md-3 Usuarios
 		.col-md-5
-			input(id="users" type="text").form-control
+			select(id="users", type="text", multiple, data-placeholder="Usuarios", name="users").form-control
+				- for(var i = 0; i < users.length; i++)
+					option(value=users[i].id)= users[i].username
 			.help-block Usuarios que tendrán acceso a ver los objetos del proyecto
 
 	.form-group
@@ -31,3 +33,5 @@ form(role="form", method="post", action="/admin_panel/projects/new").form-horizo
 			button(type="submit").btn.btn-primary Guardar
 			&nbsp;
 			a(href="/admin_panel/users") Cancelar
+
+script(src="/js/project_form.js", async)

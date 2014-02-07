@@ -1,6 +1,8 @@
 $(function() {
 	var options = {
-		valueNames: [ 'username' , 'email', 'role' ]
+		valueNames: [ 'username' , 'email', 'role' ],
+		page: 10,
+		plugins: [ ListPagination({}) ]
 	}
 
 	var userList = new List('users', options)
@@ -20,5 +22,11 @@ $(function() {
 
 		$("a.sortAsc, a.sortDesc").removeClass("active");
 		$(this).addClass("active");
-	})
+	});
+
+	$(document).ready(function() {
+		if ($(".pagination").children().length === 1) {
+			$(".pagination").hide();
+		}
+	});
 });

@@ -31,6 +31,13 @@ module.exports = function(sequelize, DataTypes) {
 
 	model.saveRecord = function(object, callback) {
 		var temp = model.build(object);
+		if (!object.progress) {
+			temp.progress = 0.0;
+		}
+
+		if (!object.status) {
+			temp.status = "active";
+		}
 
 		temp.save().success(function(project) {
 			if (callback) {

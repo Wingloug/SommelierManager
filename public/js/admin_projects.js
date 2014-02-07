@@ -1,16 +1,8 @@
 $(function() {
-	$(document).ready(function() {
-		$("#projects_table").find("tr td:nth-child(4)").each(function() {
-			var url = "/username/" + $(this).attr("data-user");
-			var td = $(this);
-			$.post(url, null, function(data) {
-				td.text(data);
-			});
-		})
-	})
-
 	var options = {
-		valueNames: [ 'name' , 'progreso', 'status' , 'username']
+		valueNames: [ 'name' , 'progreso', 'status' , 'username'],
+		page: 6,
+		plugins: [ ListPagination({}) ]
 	}
 
 	var projectList = new List('projects', options)
@@ -30,5 +22,11 @@ $(function() {
 
 		$("a.sortAsc, a.sortDesc").removeClass("active");
 		$(this).addClass("active");
+	});
+
+	$(document).ready(function() {
+		if ($(".pagination").children().length === 1) {
+			$(".pagination").hide();
+		}
 	});
 });

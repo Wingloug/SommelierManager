@@ -925,27 +925,47 @@ module.exports = function(app, models) {
 			href: "/admin_panel/projects/new"
 		}
 
-		res.render("project_form", { title: "Administración - Crear Nuevo Proyecto", crumbs: crumbs, children: [], project: {}, statuses: statuses, flash: req.flash(), active: 2 });
+		models.User.findAll().success(function(users) {
+			res.render("project_form", { title: "Administración - Crear Nuevo Proyecto", users: users, crumbs: crumbs, children: [], project: {}, statuses: statuses, flash: req.flash(), active: 2 });
+		}).error(function(err) {
+			console.log(err);
+			res.render("project_form", { title: "Administración - Crear Nuevo Proyecto", users: [], crumbs: crumbs, children: [], project: {}, statuses: statuses, flash: req.flash(), active: 2 });
+		})
+
+
 	});
 
 	app.post("/admin_panel/projects/new", function(req, res) {
-		// name, progress, status
+		// name, progress, status, users
+		console.log("auth login");
 
 		var project = {
 			name: req.body.name,
 			progress: req.body.progress,
 			status: req.body.status,
+			created_by: 1
 		}
 
 		models.Project.saveRecord(project, function(record, err) {
 			if (err) {
+				console.log(err);
 				req.flash("error", "No fue posible crear el proyecto. Inténtelo nuevamente");
 			}
 			else {
+				if (req.param("users").length >= 1) {
+					for (var i = 0; i < req.param("users").length; i++) {
+						models.UserProject.saveRecord({ project_id: record.id, user_id: req.param("users")[i] }, function(user_project, err) {
+							if (err) {
+								console.log(err);
+							}
+						});
+					}
+				}
 				req.flash("success", "Proyecto creado correctamente");
 			}
 			res.redirect("/admin_panel/projects/new");
 		});
+
 	});
 
 	app.get("/admin_panel/projects/:id", function(req, res) {

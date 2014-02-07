@@ -78,5 +78,11 @@ module.exports = function(app, express) {
 
 	var models = require(app.root + "/config/db/models/models")(app.root, sequelize);
 
+	app.locals.username = function(id) {
+		models.User.find(id).success(function(user) {
+			return user.username
+		});
+	}
+
 	return models;
 };

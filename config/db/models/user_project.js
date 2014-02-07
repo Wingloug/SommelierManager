@@ -28,13 +28,13 @@ module.exports = function(sequelize, DataTypes) {
 	model.saveRecord = function(object, callback) {
 		var temp = model.build(object);
 
-		temp.save().success(function() {
+		temp.save().success(function(user_project) {
 			if (callback) {
-				callback();
+				callback(user_project);
 			}
-		}).error(function() {
+		}).error(function(err) {
 			if (callback) {
-				callback();
+				callback(null, err);
 			}
 		});
 	}
