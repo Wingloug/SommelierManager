@@ -3,7 +3,15 @@ module.exports = function(app, express) {
 	var nib = require("nib");
 	var Sequelize = require("sequelize");
 	var uuid = require("node-uuid");
-	var flash = require('connect-flash');
+	var flash = require("connect-flash");
+	var mongoose = require("mongoose");
+
+	mongoose.connect('mongodb://localhost/prototipo_dev');
+	var db = mongoose.connection;
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function callback () {
+		var test = require(app.root + "/db/models")(app.root, mongoose);
+	});
 
 	function compile(str, path) {
 		console.log("compile " + path);
