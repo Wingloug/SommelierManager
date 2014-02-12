@@ -26,12 +26,15 @@
 						a(class="sortDesc", data-sort="role")
 							span.glyphicon.glyphicon-chevron-down
 		tbody.list
-			- for (var i = 0; i < users.length; i++)
-				tr
-					td(class="username")= users[i].username
-					td(class="email")= users[i].email
-					td= users[i].name
-					td= users[i].last_name
-					td(class="role")= users[i].role
+			-if (users.length)
+				- for (var i = 0; i < users.length; i++)
+					tr
+						td(class="username")= users[i].username
+						td(class="email")= users[i].email
+						td= users[i].name
+						td= users[i].last_name
+						td(class="role")= users[i].role
+			- else
+				tr: td(colspan=5).text-center Usuarios no encontrados
 
 	ul.pagination.pull-right

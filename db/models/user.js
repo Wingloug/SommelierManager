@@ -25,7 +25,7 @@ module.exports = function(mongoose) {
 		},
 		last_name: {
 			type: String,
-			default: ""
+			default: "",
 			lowercase: true,
 			trim: true
 		},
@@ -50,7 +50,7 @@ module.exports = function(mongoose) {
 			},
 			task_description: {
 				type: String,
-				default: ""
+				default: "",
 				trim: true
 			},
 			progress: {

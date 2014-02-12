@@ -1,11 +1,13 @@
 var express = require("express")
 	, http = require("http")
-	, app = express();
+	, app = express()
+	, mongoose = require("mongoose");
 
 app.root = __dirname;
 
-var models = require("./config/server")(app, express);
+require("./config/server")(app, express);
 
+var models =  require(app.root + "/db/models")(app.root, mongoose);
 // Rutas
 require("./config/routes")(app, models);
 
