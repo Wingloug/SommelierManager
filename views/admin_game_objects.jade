@@ -1,0 +1,12 @@
+extends layout/admin_layout
+
+block content
+	h2 Sommelier Manager
+	include _flash
+
+	p.pull-right
+		a(href="/admin_panel/gameobjects/new")
+			i.glyphicon.glyphicon-plus Agregar
+	include game_object/_game_object_table
+
+	script(src="/js/admin_game_objects.js", type="text/javascript", async)

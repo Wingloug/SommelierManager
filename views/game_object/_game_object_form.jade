@@ -1,0 +1,37 @@
+//- game_object {name, description, parent, project, files}
+form(role="form", method="post", action="/admin_panel/gameobjects/new").form-horizontal
+	.form-group
+		label(for="name").control-label.col-md-3 Nombre
+		.col-md-5
+			input(id="name", placeholder="Nombre", type="text", name="name", value=(game_object.name ? game_object.name : "")).form-control
+
+	.form-group
+		label(for="description").control-label.col-md-3 Descripción
+		.col-md-5
+			textarea(id="description", name="description", value=(game_object.name ? game_object.name : "")).form-control
+
+	.form-group
+		label(for="parent").control-label.col-md-3 Objeto Padre
+		.col-md-5
+			select(id="parent", name="parent").form-control
+				option(value="", data-project="") Ninguno
+				- for(var i = 0; i < parents.length; i++)
+					- var branch = "";
+					- for (var j = 0; j < parents[i].branch.length; j++)
+						- branch += parents[i].branch[j].toString() + " "
+					option(value=parents[i].id, data-project=parents[i].project.toString(), data-branch=branch)= parents[i].name
+	input(id="branch", name="branch", type="hidden", value="");
+	.form-group
+		label(for="project").control-label.col-md-3 Proyecto
+		.col-md-5
+			select(id="project", name="project").form-control
+				- for(var i = 0; i < projects.length; i++)
+					option(value=projects[i].id)= projects[i].name
+			input(id="hidden_project", name="project", type="hidden", disabled=true, value="")
+
+	.form-group
+		.col-md-offset-3.col-md-5
+			button(type="submit").btn.btn-primary Guardar
+			a(href="/admin_panel/users").btn.btn-link Cancelar
+
+script(src="/js/game_object_form.js", async)

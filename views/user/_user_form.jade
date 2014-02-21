@@ -5,7 +5,8 @@ form(role="form", method="post", action="/admin_panel/users/new").form-horizonta
 		label(for="username").control-label.col-md-3 Nombre de usuario
 		.col-md-5
 			input(id="username", placeholder="Nombre de usuario", type="text", name="username", value=(user.username ? user.username : ""), required=true).form-control
-	- if (!user.username)
+	- if (flag === "new" || true )
+		//- Mostrar contraseña si el usuario aun no es creado (flag=>new) o si es que el usuario logeado es igual al del form (true)
 		.form-group
 			label(for="password").control-label.col-md-3 Contraseña
 			.col-md-5
@@ -32,8 +33,17 @@ form(role="form", method="post", action="/admin_panel/users/new").form-horizonta
 			select(id="role", name="role").form-control
 				- for (var i = 0; i < roles.length ; i++)
 					option(selected=((user.rol ? ((user.rol == roles[i]) ? true : false) : (i == 1 ? true : false))), value=i)= roles[i]
+
+	.form-group
+		label(for="projects").control-label.col-md-3 Proyectos
+		.col-md-5
+			select(id="projects", name="projects", type="text", multiple, data-placeholder="Proyectos").form-control
+				- for(var i = 0; i < projects.length; i++)
+					option(value=projects[i].id)= projects[i].name
+			.help-block Proyectos a los que tendrá acceso
 	.form-group
 		.col-md-offset-3.col-md-5
 			button(type="submit").btn.btn-primary Guardar
-			&nbsp;
-			a(href="/admin_panel/users") Cancelar
+			a(href="/admin_panel/users").btn.btn-link Cancelar
+
+script(src="/js/user_form.js", async)

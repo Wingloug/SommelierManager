@@ -11,54 +11,46 @@ module.exports = function(app, models) {
 	// Projects
 	app.get("/projects", function(req, res) {
 		var crumbs = [];
-		var response = [];
 		// root
 		crumbs[0] = {
 			id: -1,
 			name: "Projects",
 			href: "/projects"
 		}
+
+		var id = new mongoose.Types.ObjectId("52f84ef58f6a11cf3a28473d");
 		var user = {
-			id: 1,
+			id: id,
 			username: "testing_user",
 		}
 
-		// models.UserProject.findAll({
-		// 	where: {
-		// 		user_id: user.id
-		// 	}
-		// }).success(function(user_projects) {
-		// 	var project_ids = [];
-		// 	for (var i=0; i < user_projects.length; i++) {
-		// 		project_ids[i] = user_projects[i].project_id;
-		// 	}
+		models.User.findById(id).populate("projects").exec(function(err, user) {
+			if (err || !user) {
+				res.render('projects', { title: "Prototipo - Projects", crumbs: crumbs, children: [], projects: [], user: user, flash: req.flash()});
+			}
 
-		// 	models.Project.findAll({ where: { id: project_ids} })
-		// 		.success(function(projects) {
-		// 			for (var i=0; i < projects.length; i++) {
-		// 				response[i] = {
-		// 					id: projects[i].id,
-		// 					name: projects[i].name,
-		// 					progress: projects[i].progress,
-		// 					status: projects[i].status
-		// 				}
-		// 			}
-
-		// 			res.render('projects', { title: "Prototipo - Projects", crumbs: crumbs, children: [], projects: response, user: user});
-		// 		})
-		// 		.error(function() {
-		// 			res.render('projects', { title: "Prototipo - Projects", crumbs: crumbs, children: [], projects: [], user: user});
-		// 		});
-
-		// }).error(function() {
-
-		// });
+			res.render('projects', { title: "Prototipo - Projects", crumbs: crumbs, children: [], projects: user.projects, user: user, flash: req.flash()});
+		});
 	});
 
 	app.post("/children", function(req, res) {
-		var id = req.body.parent;
+		var id = req.param("parent");
 		var children = [];
-		var response = [];
+
+		models.GameObject.find({ parent: id }).exec(function(err, objects) {
+			if (err || !objects) {
+				res.send(202, []);
+			}
+			else {
+				for (var i = 0; i < objects.length; i++ ) {
+					children[i] = {
+						id : objects[i].id.toString(),
+						name: objects[i].name,
+					}
+				}
+				res.send(200, children);
+			}
+		});
 		// models.GameObject.findAll({
 		// 	where: { parent_id: id }
 		// }).success(function(children) {
@@ -76,8 +68,8 @@ module.exports = function(app, models) {
 
 
 	app.get("/projects/:project_name", function(req, res) {
-		var project_name = req.params.project_name;
-		var project_id = -1;
+		req.sanitize("project_name");
+		var project_name = req.param("project_name");
 		var crumbs = [];
 		var children = [];
 
@@ -86,89 +78,52 @@ module.exports = function(app, models) {
 			name: "Projects",
 			href: "/projects"
 		}
-		var user = {
-			id: 1,
-			username: "testing_user",
-		}
 
-		// models.Project.find({
-		// 	where: {
-		// 		name: project_name
-		// 	}
-		// }).success(function(project) {
-		// 	// Se obtiene el proyecto consultado
-		// 	if (project) {
-		// 		project_id = project.id;
-		// 		models.UserProject.find({
-		// 			where: {
-		// 				user_id: user.id,
-		// 				project_id: project.id
-		// 			}
-		// 		}).success(function(user_project) {
-		// 			// El usuario logeado tiene acceso al proyecto
-		// 			if (user_project) {
-		// 				models.GameObject.findAll({
-		// 					where: {
-		// 						project_id: user_project.project_id,
-		// 						parent_id: null
-		// 					}
-		// 				}).success(function(objects) {
-		// 					//  Se obtienen todos los objetos asociados al proyecto
-		// 					var response = [];
-		// 					for (var i = 0; i < objects.length; i++) {
-		// 						response[i] = {
-		// 							id: objects[i].id,
-		// 							name: objects[i].name
-		// 						}
-		// 					}
-
-		// 					crumbs[1] = {
-		// 						id: project_id,
-		// 						name: project_name,
-		// 						href: "/projects/" + project_name
-		// 					}
-
-		// 					models.GameObject.findAll({
-		// 						where: {
-		// 							project_id: project_id,
-		// 							parent_id: null
-		// 						}
-		// 					}).success(function(objects) {
-		// 						// Se obtienen los hijos directos del proyecto (breadcrumbs)
-		// 						for (var i = 0; i < objects.length; i++) {
-		// 							children[i] = {
-		// 								id: objects[i].id,
-		// 								name: objects[i].name,
-		// 								href: "/projects/" + project_name + "/panel/" + objects[i].id
-		// 							}
-		// 						}
-
-		// 						res.render('objects_tree', { title: 'Prototipo - Project Objects', path: "/projects/" + project_name + "/",  crumbs: crumbs, children: children, objects: response, user: user});
-		// 					}).error(function() {
-		// 						res.render('objects_tree', { title: 'Prototipo - Project Objects', path: "/projects/" + project_name + "/",  crumbs: crumbs, children: [], objects: response, user: user});
-		// 					});
-		// 				}).error(function() {
-		// 					// Error al obtener los objetos asociados al proyecto
-		// 					res.render('objects_tree', { title: 'Prototipo - Project Objects', path: "/projects/" + project_name + "/", crumbs: crumbs, objects: [], user: user});
-		// 				});
-		// 			}
-		// 			else {
-		// 				// El usuario no tiene acceso al proyecto
-		// 				res.redirect(401, "/");
-		// 			}
-		// 		}).error(function() {
-		// 			// Error al consultar si el usuario tiene acceso al proyecto
-		// 			res.redirect(401, "/");
-		// 		});
-		// 	}
-		// 	else {
-		// 		// El proyecto no existe
-		// 		res.redirect(404, "/");
-		// 	}
-		// }).error(function() {
-		// 	// Error al obtener el proyecto
-		// 	res.redirect(404, "/");
-		// });
+		models.Project.findOne({ name: project_name }).exec(function(err, project) {
+			if (err) {
+				req.flash("error", "Ocurrió un error inesperado. Inténte nuevamente.");
+				res.redirect("/projects");
+			}
+			if (!project) {
+				req.flash("error", "Proyecto no encontrado");
+				res.redirect("/projects");
+			}
+			else {
+				crumbs[1] = {
+					id: project.id,
+					name: project_name,
+					href: "/projects/" + project.name
+				}
+				// Comparar permiso de acceso del usuario logeado al proyecto
+				if (app.locals.user.projects.indexOf(project.id) != -1) {
+					models.GameObject.find({ project: project.id }).exists("parent", false).exec(function(err, game_objects) {
+						if (err) {
+							console.log(err);
+							req.flash("error", "Ocurrió un error inesperado. Inténte nuevamente.");
+							res.redirect("/projects");
+						}
+						if (!game_objects) {
+							req.flash("info", "El proyecto no tiene objetos asociados");
+							res.render('objects_tree', { title: 'Prototipo - Project Objects', path: "/projects/" + project_name + "/",  crumbs: crumbs, children: children, objects: [], user: app.locals.user, flash: req.flash()});
+						}
+						else {
+							for (var i = 0; i < game_objects.length; i++) {
+								children[i] = {
+									id: game_objects[i].id,
+									name: game_objects[i].name,
+									href: "/projects/" + project.name + "/panel/" + game_objects[i].id
+								}
+							}
+							res.render('objects_tree', { title: 'Prototipo - Project Objects', path: "/projects/" + project_name + "/",  crumbs: crumbs, children: children, objects: game_objects, user: app.locals.user, flash: req.flash()});
+						}
+					});
+				}
+				else {
+					req.flash("error", "No tiene acceso al proyecto " + project.name);
+					res.redirect("/projects");
+				}
+			}
+		})
 	});
 
 	app.get("/projects/:project_name/panel/:object_id", function(req, res) {
@@ -847,20 +802,43 @@ module.exports = function(app, models) {
 			href: "/admin_panel/users/new"
 		}
 
-		res.render("user_form", { title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], user: {}, roles: roles, flash: req.flash(), active: 1 });
+		models.Project.find().exec(function(err, projects) {
+			if (err) {
+				console.log(err);
+				req.flash("error", err);
+				res.render("user_form", { title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], user: {}, projects: [], roles: roles, flash: req.flash(), active: 1 });
+			}
+			if (!projects) {
+				res.render("user_form", { title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], user: {}, projects: [], roles: roles, flash: req.flash(), active: 1 });
+			}
+			else {
+				res.render("user_form", { title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], user: {}, projects: projects, roles: roles, flash: req.flash(), active: 1 });
+			}
+		});
 	});
 
 	app.post("/admin_panel/users/new", function(req, res) {
 		// username, password, password_repeat, email, name, last_name, rol
+		req.sanitize("username").trim();
+		req.sanitize("password");
+		req.sanitize("password_repeat");
+		req.sanitize("email");
+		req.sanitize("name").trim();
+		req.sanitize("last_name").trim();
+		req.sanitize("roles").toInt();
+
+		req.assert("password", "La contraseña y su confimación no coinciden").equals(req.param("password_repeat"));
+		req.assert("email", "Email no válido").isEmail();
+
 		var errors = [];
+		var temp = req.validationErrors();
+		for (var i = 0; i < temp.length; i++) {
+			errors.push(temp[i].msg)
+		}
+
 		check_username(req.body.username, function(disponible) {
 			if (!disponible) {
-				req.flash("error", "Nombre de usuario no disponible");
-				errors.push("username");
-			}
-			if (!check_password(req.body.password, req.body.password_repeat)) {
-				req.flash("error", "La contraseña y su confimación no coinciden");
-				errors.push("password");
+				errors.push("Nombre de usuario no disponible");
 			}
 
 			if (!errors.length) {
@@ -868,13 +846,31 @@ module.exports = function(app, models) {
 				user.username = req.param("username");
 				user.password = req.param("password");
 				user.email = req.param("email");
-				user.name = req.param("name"),
-				user.last_name = req.param("last_name"),
-				user.rol = req.param("rol")
+				user.name = req.param("name");
+				user.last_name = req.param("last_name");
+				user.rol = req.param("rol");
+
+				if (req.param("projects")) {
+					if (Array.isArray(req.param("projects"))) {
+						var projects = [];
+						for (var i = 0; i < req.param("projects").length; i++) {
+							var id = new mongoose.Types.ObjectId(req.param("projects")[i]);
+							projects.push(id);
+						}
+						user.projects = projects;
+					}
+					else {
+						var id = new mongoose.Types.ObjectId(req.param("projects"));
+						var projects = [];
+						projects.push(id);
+						user.projects = projects;
+					}
+				}
 
 				user.save(function(err, user) {
 					if (err) {
 						console.log(err);
+						req.flash("error", err);
 						req.flash("error", "No fue posible crear el usuario. Inténtelo nuevamente");
 					}
 					else {
@@ -885,7 +881,49 @@ module.exports = function(app, models) {
 				});
 			}
 			else {
-				res.redirect("/admin_panel/users/new");
+				req.flash("error", errors);
+
+				var roles = [];
+				roles[0] = "Administrador";
+				roles[1] = "Usuario";
+
+				var crumbs = []
+				crumbs[0] = {
+					name: "Administración",
+					href: "/admin_panel"
+				}
+
+				crumbs[1] = {
+					name: "Usuarios",
+					href:"/admin_panel/users/"
+				}
+
+				crumbs[2] = {
+					name: "Nuevo usuario",
+					href: "/admin_panel/users/new"
+				}
+
+				var user = {};
+				user.username = req.param("username");
+				user.password = "";
+				user.email = req.param("email");
+				user.name = req.param("name");
+				user.last_name = req.param("last_name");
+				user.rol = req.param("rol");
+
+				models.Project.find().exec(function(err, projects) {
+					if (err) {
+						console.log(err);
+						req.flash("error", err);
+						res.render("user_form", { title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], flag: "new", user: user, projects: [], roles: roles, flash: req.flash(), active: 1 });
+					}
+					if (!projects) {
+						res.render("user_form", { title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], flag: "new", user: user, projects: [], roles: roles, flash: req.flash(), active: 1 });
+					}
+					else {
+						res.render("user_form", { title: "Administración - Crear Nuevo Usuario", crumbs: crumbs, children: [], flag: "new", user: user, projects: projects, roles: roles, flash: req.flash(), active: 1 });
+					}
+				});
 			}
 		});
 	});
@@ -947,18 +985,11 @@ module.exports = function(app, models) {
 
 	app.post("/admin_panel/projects/new", function(req, res) {
 		// name, progress, status, users
-		req.sanitize("name");
+		req.sanitize("name").trim();
 		req.sanitize("progress").toInt();
-		req.sanitize("status");
+		req.sanitize("status").toInt();
 		req.sanitize("users");
 
-		console.log(Array.isArray(req.param("users")));
-		var project = {
-			name: req.body.name,
-			progress: req.body.progress,
-			status: req.body.status,
-			created_by: 1
-		}
 		var project = new models.Project();
 		project.name = req.param("name");
 		project.status = req.param("status");
@@ -1027,9 +1058,10 @@ module.exports = function(app, models) {
 		});
 	});
 
-	app.get("/admin_panel/projects/:id", function(req, res) {
-		req.sanitize("id");
-		var id = new mongoose.Types.ObjectId(req.param("id"));
+	app.get("/admin_panel/projects/:name", function(req, res) {
+		req.sanitize("name");
+		// var id = new mongoose.Types.ObjectId(req.param("id"));
+
 		console.log("auth login");
 		var statuses = [];
 
@@ -1049,22 +1081,24 @@ module.exports = function(app, models) {
 			href: "/admin_panel/projects/" + req.param("id")
 		}
 
-		models.Project.findById(id).populate("created_by").exec(function(err, project) {
+		models.Project.findOne({ name: req.param("name") }).populate("created_by").exec(function(err, project) {
 			if (err) {
 				console.log(err);
 				req.flash("error", "Se ha producido un error. Inténtelo nuevamente");
-				res.redirect("admin_panel/projects");
+				res.redirect("/admin_panel/projects");
 			}
 
 			if (!project) {
 				console.log("Proyecto no encontrado");
 				req.flash("error", "El proyecto no fue encontrado");
-				res.redirect("admin_panel/projects");
+				res.redirect("/admin_panel/projects");
 			}
 			else {
-				models.User.find({ projects: id }).exec(function(err, users) {
+				models.User.find({ projects: project.id }).exec(function(err, users) {
 					if (err) {
 						console.log(err);
+						req.flash("error", err);
+						res.render("project_details", { title: "Administración - Detalle proyecto", crumbs: crumbs, children: [], project: project, users: [], flash: req.flash, active: 2 });
 					}
 
 					if (!users) {
@@ -1075,6 +1109,112 @@ module.exports = function(app, models) {
 					}
 				});
 			}
+		});
+	});
+
+	app.get("/admin_panel/gameobjects", function(req, res) {
+		console.log("auth login");
+
+		models.GameObject.find().populate("project").populate("parent").exec(function(err, game_objects) {
+			if (err) {
+				console.log(err);
+				req.flash("error", err);
+				res.render("admin_game_objects", {title: "Administración - Proyectos", game_objects: [], flash: req.flash(), active: 3 });
+			}
+			if (!game_objects) {
+				res.render("admin_game_objects", {title: "Administración - Proyectos", game_objects: [], flash: req.flash(), active: 3 });
+			}
+			else {
+				res.render("admin_game_objects", {title: "Administración - Proyectos", game_objects: game_objects, flash: req.flash(), active: 3 });
+			}
+		});
+	});
+
+	app.get("/admin_panel/gameobjects/new", function(req, res) {
+		console.log("auth login");
+
+		var crumbs = []
+		crumbs[0] = {
+			name: "Administración",
+			href: "/admin_panel"
+		}
+
+		crumbs[1] = {
+			name: "Game Objects",
+			href:"/admin_panel/gameobjects/"
+		}
+
+		crumbs[2] = {
+			name: "Nuevo game object",
+			href: "/admin_panel/gameobjects/new"
+		}
+
+		models.Project.find().exec(function(err, projects) {
+			if (err) {
+				console.log(err);
+				req.flash("error", err);
+				res.redirect("/admin_panel/gameobjects")
+			}
+			if (!projects) {
+				req.flash("error", "No se encontró ningún proyecto. Es necesario que exista uno previamente antes de crear un Game Object.");
+				res.redirect("/admin_panel/projects/new");
+			}
+			else {
+				models.GameObject.find().exec(function(err, parents) {
+					if (err) {
+						console.log(err);
+						req.flash("error", err);
+						res.render("game_object_form", { title: "Administración - Crear Nuevo Game Object", parents: [], projects: projects, crumbs: crumbs, children: [], game_object: {}, flash: req.flash(), active: 3 });
+					}
+					if (!parents) {
+						res.render("game_object_form", { title: "Administración - Crear Nuevo Game Object", parents: [], projects: projects, crumbs: crumbs, children: [], game_object: {}, flash: req.flash(), active: 3 });
+					}
+					else {
+						res.render("game_object_form", { title: "Administración - Crear Nuevo Game Object", parents: parents, projects: projects, crumbs: crumbs, children: [], game_object: {}, flash: req.flash(), active: 3 });
+					}
+				});
+			}
+		});
+	});
+
+	app.post("/admin_panel/gameobjects/new", function(req, res) {
+		// name, description, parent, branch, project
+		req.sanitize("name").trim();
+		req.sanitize("description").trim();
+		req.sanitize("parent");
+		req.sanitize("branch").trim();
+		req.sanitize("project");
+
+		console.log(req.body);
+
+		var game_object = new models.GameObject();
+		game_object.name = req.param("name");
+		game_object.description = req.param("description");
+		if (req.param("parent")) {
+			game_object.parent = new mongoose.Types.ObjectId(req.param("parent"));
+			var branch = [];
+			if (req.param("branch")) {
+				var temp = req.param("branch").split(" ");
+				for (var i = 0; i < temp.length ; i++) {
+					branch.push(new mongoose.Types.ObjectId(temp[i]));
+				}
+			}
+			branch.push(game_object.parent);
+
+			game_object.branch = branch;
+		}
+		game_object.project = new mongoose.Types.ObjectId(req.param("project"));
+
+		game_object.save(function(err, nuevo) {
+			if (err) {
+				console.log(err);
+				req.flash("error", "No fue posible crear el objeto. Inténtelo nuevamente");
+			}
+			else {
+				req.flash("success", "Objeto creado correctamente");
+			}
+
+			res.redirect("/admin_panel/gameobjects/new");
 		});
 	});
 
@@ -1092,11 +1232,6 @@ module.exports = function(app, models) {
 				res.send(200, user.username);
 			}
 		});
-		// models.User.find(req.params.id).success(function(user) {
-		// 	res.send(200, user.username);
-		// }).error(function(err) {
-		// 	res.send(202, err);
-		// })
 	});
 
 	app.get("*", function(req, res) {
@@ -1112,9 +1247,5 @@ module.exports = function(app, models) {
 				callback(false);
 			}
 		});
-	}
-
-	function check_password(password, password_repeat) {
-		return password === password_repeat;
 	}
 };

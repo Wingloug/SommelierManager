@@ -2,9 +2,8 @@ extends layout/layout
 
 block content
 	h1= title
-	p Welcome to #{title}
 	include layout/_breadcrumbs
-
+	include _flash
 	div: ul
 		- for (var i=0; i< projects.length; i++)
 			li(id=projects[i].name)

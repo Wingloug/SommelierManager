@@ -1,0 +1,36 @@
+#game_objects
+	div(style="margin-bottom: 0.8em").form-inline
+		input(type="text", placeholder="Buscar", style="width: 12em; margin-right: 0.4em").search.form-control
+		button(type="button").btn.btn-default Limpiar
+	table.table.table-stripped.table-bordered.table-hover
+		thead
+			tr
+				th Nombre
+					div.sorters
+						a(class="sortAsc", data-sort="name")
+							span.glyphicon.glyphicon-chevron-up
+						a(class="sortDesc", data-sort="name")
+							span.glyphicon.glyphicon-chevron-down
+				th Objeto Padre
+					div.sorters
+						a(class="sortAsc", data-sort="parent")
+							span.glyphicon.glyphicon-chevron-up
+						a(class="sortDesc", data-sort="parent")
+							span.glyphicon.glyphicon-chevron-down
+				th Proyecto
+					div.sorters
+						a(class="sortAsc", data-sort="role")
+							span.glyphicon.glyphicon-chevron-up
+						a(class="sortDesc", data-sort="role")
+							span.glyphicon.glyphicon-chevron-down
+		tbody.list
+			-if (game_objects.length)
+				- for (var i = 0; i < game_objects.length; i++)
+					tr
+						td(class="name")= game_objects[i].name
+						td(class="parent")= (game_objects[i].parent ? game_objects[i].parent.name : "")
+						td(class="project")= game_objects[i].project.name
+			- else
+				tr: td(colspan=5).text-center Objetos no encontrados
+
+	ul.pagination.pull-right
