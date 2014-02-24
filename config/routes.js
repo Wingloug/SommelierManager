@@ -1,5 +1,6 @@
 module.exports = function(app, models) {
 	var mongoose = require("mongoose");
+	var async = require("async");
 	/*
 	  * models: { User, Project, GameObject, UserProject, UserObject, ObjectFile }
 	  */
@@ -18,18 +19,12 @@ module.exports = function(app, models) {
 			href: "/projects"
 		}
 
-		var id = new mongoose.Types.ObjectId("52f84ef58f6a11cf3a28473d");
-		var user = {
-			id: id,
-			username: "testing_user",
-		}
-
-		models.User.findById(id).populate("projects").exec(function(err, user) {
+		models.User.findById(app.locals.user.id).populate("projects").exec(function(err, user) {
 			if (err || !user) {
-				res.render('projects', { title: "Prototipo - Projects", crumbs: crumbs, children: [], projects: [], user: user, flash: req.flash()});
+				res.render('projects', { title: "Prototipo - Projects", crumbs: crumbs, children: [], projects: [], user: app.locals.user, flash: req.flash()});
 			}
 
-			res.render('projects', { title: "Prototipo - Projects", crumbs: crumbs, children: [], projects: user.projects, user: user, flash: req.flash()});
+			res.render('projects', { title: "Prototipo - Projects", crumbs: crumbs, children: [], projects: user.projects, user: app.locals.user, flash: req.flash()});
 		});
 	});
 
@@ -51,19 +46,6 @@ module.exports = function(app, models) {
 				res.send(200, children);
 			}
 		});
-		// models.GameObject.findAll({
-		// 	where: { parent_id: id }
-		// }).success(function(children) {
-		// 	for (var i = 0; i < children.length; i++ ) {
-		// 		response[i] = {
-		// 			id : children[i].id,
-		// 			name: children[i].name,
-		// 		};
-		// 	}
-		// 	res.send(200, response);
-		// }).error(function() {
-		// 	res.send(202, children);
-		// });
 	});
 
 
@@ -96,6 +78,7 @@ module.exports = function(app, models) {
 				}
 				// Comparar permiso de acceso del usuario logeado al proyecto
 				if (app.locals.user.projects.indexOf(project.id) != -1) {
+					// Se obtienen los hijos directos del proyecto (objetos sin padre)
 					models.GameObject.find({ project: project.id }).exists("parent", false).exec(function(err, game_objects) {
 						if (err) {
 							console.log(err);
@@ -104,7 +87,7 @@ module.exports = function(app, models) {
 						}
 						if (!game_objects) {
 							req.flash("info", "El proyecto no tiene objetos asociados");
-							res.render('objects_tree', { title: 'Prototipo - Project Objects', path: "/projects/" + project_name + "/",  crumbs: crumbs, children: children, objects: [], user: app.locals.user, flash: req.flash()});
+							res.render('objects_tree', { title: 'Prototipo - Project Objects', path: "/projects/" + project_name + "/",  crumbs: crumbs, children: children, objects: [], user: app.locals.user, flash: req.flash() });
 						}
 						else {
 							for (var i = 0; i < game_objects.length; i++) {
@@ -127,9 +110,11 @@ module.exports = function(app, models) {
 	});
 
 	app.get("/projects/:project_name/panel/:object_id", function(req, res) {
-		var project_name = req.params.project_name;
-		var object = {};
-		var object_files = [];
+		req.sanitize("project_name");
+		req.sanitize("object_id");
+
+		var project_name = req.param("project_name");
+		var game_object_files = [];
 		var children = [];
 		var crumbs = [];
 		var extra = {};
@@ -137,186 +122,163 @@ module.exports = function(app, models) {
 		var doing = [];
 		var done = [];
 
-		crumbs[0] = {
+		crumbs.push({
 			id: -1,
 			name: "Projects",
 			href: "/projects"
-		}
+		});
 
-		// models.GameObject.find(req.params.object_id)
-		// 	.success(function(object) {
-		// 		// Se obtiene el objeto consultado
-		// 		var response = {
-		// 			id: object.id,
-		// 			name: object.name,
-		// 			description: object.description,
-		// 		};
-		// 		var branch = object.branch.split(",");
+		models.GameObject.findById(req.param("object_id")).populate('files').exec(function(err, game_object) {
+			if (err) {
+				console.log(err);
+				req.flash("error", err);
+				res.redirect("/project/" + project_name);
+			}
 
-		// 		crumbs[1] = {
-		// 			id: object.project_id,
-		// 			name: project_name,
-		// 			href: "/projects/" + project_name,
-		// 		}
+			if (!game_object) {
+				req.flash("error", "El objeto no existe");
+				res.redirect("/project/" + project_name);
+			}
+			else {
+				// Comprobar que el usuario logeado tiene acceso al objeto (proyecto)
+				if (app.locals.user.projects.indexOf(game_object.project) != -1) {
+					game_object_files = game_object.files;
 
-		// 		models.GameObject.findAll({
-		// 			where: {
-		// 				id: branch
-		// 			}
-		// 		}).success(function(objects) {
-		// 			// Se completan los breadcrumbs
-		// 			for (var i = 0; i < objects.length; i++) {
-		// 				crumbs[i+2] = {
-		// 					id: objects[i].id,
-		// 					name: objects[i].name,
-		// 					href: "/projects/" + project_name + "/panel/" + objects[i].id
-		// 				}
-		// 			}
+					var branch = game_object.branch;
 
-		// 			crumbs[i+2] = {
-		// 				id: response.id,
-		// 				name: response.name,
-		// 				href: "/projects/" + project_name + "/panel/" + response.id
-		// 			}
+					var response = {
+						id: game_object.id,
+						name: game_object.name,
+						description: game_object.description
+					}
 
-		// 			models.ObjectFile.findAll({
-		// 				order: [ "type" ],
-		// 				where: {
-		// 					game_object_id: response.id
-		// 				},
-		// 			}).success(function(files) {
-		// 				// Se obtienen los archivos asociados al objeto
-		// 				for (var i=0; i < files.length; i++) {
-		// 					object_files[i] = {
-		// 						extension: 			files[i].extension,
-		// 						path: 				files[i].path,
-		// 						original_filename: 	files[i].original_filename,
-		// 						filename: 			files[i].filename,
-		// 						type: 				files[i].type,
-		// 						description: 		files[i].description
-		// 					}
-		// 				}
+					crumbs.push({
+						id: game_object.project,
+						name: project_name,
+						href: "/projects/" + project_name
+					});
 
-		// 				models.GameObject.findAll({
-		// 					where: {
-		// 						parent_id: response.id
-		// 					}
-		// 				}).success(function(objects) {
-		// 					// Se obtienen los hijos directos del proyecto (breadcrumbs)
-		// 					for (var i = 0; i < objects.length; i++) {
-		// 						children[i] = {
-		// 							id: objects[i].id,
-		// 							name: objects[i].name,
-		// 							href: "/projects/" + project_name + "/panel/" + objects[i].id
-		// 						}
-		// 					}
+					// Se completan los breadcrumbs
+					if (branch.length) {
+						models.GameObject.find().in("_id", branch).exec(function(err, game_objects) {
+							if (err) {
+								console.log(err);
+							}
 
-		// 					models.UserObject.find({
-		// 						where: {
-		// 							user_id: 1,
-		// 							game_object_id: req.params.object_id
-		// 						}
-		// 					}).success(function(user_object) {
-		// 						// Se determina si es que existe contenido específico para el usuario que mostrar adicionalmente
-		// 						if (user_object) {
-		// 							extra.user_object_id = user_object.id;
-		// 							extra.role = user_object.role;
-		// 							extra.task_description = user_object.task_description;
-		// 							extra.progress = user_object.progress;
+							if (!game_objects) {
+								crumbs.push({
+									id: response.id,
+									name: response.name,
+									href: "/projects/" + project_name + "/panel/" + response.id
+								});
+							}
+							else {
+								for (var i = 0; i < game_objects.length; i++) {
+									crumbs.push({
+										id: game_objects[i].id,
+										name: game_objects[i].name,
+										href: "/projects/" + project_name + "/panel/" + game_objects[i].id
+									});
+								}
 
-		// 							models.Board.find({
-		// 								where: {
-		// 									user_object_id: user_object.id
-		// 								}
-		// 							}).success(function(board) {
-		// 								if (board) {
-		// 									var id = board.id;
-		// 									extra.board_id = board.id;
-		// 									// Se encuentran los items para cada contenedor del panel to do
-		// 									models.BoardItem.findAll({
-		// 										where: {
-		// 											board_id: id,
-		// 											container: "todo"
-		// 										}
-		// 									}).success(function(todo_items) {
-		// 										for (var i = 0; i < todo_items.length; i ++) {
-		// 											todo[i] = {
-		// 												id: todo_items[i].id,
-		// 												board_id: todo_items[i].board_id,
-		// 												container: todo_items[i].container,
-		// 												description: todo_items[i].description,
-		// 												label: todo_items[i].label
-		// 											}
-		// 										}
+								crumbs.push({
+									id: response.id,
+									name: response.name,
+									href: "/projects/" + project_name + "/panel/" + response.id
+								});
+							}
+						});
+					}
+					else {
+						crumbs.push({
+							id: response.id,
+							name: response.name,
+							href: "/projects/" + project_name + "/panel/" + response.id
+						});
+					}
 
-		// 										// Se encuentran los items para cada contenedor del panel doing
-		// 										models.BoardItem.findAll({
-		// 											where: {
-		// 												board_id: id,
-		// 												container: "doing"
-		// 											}
-		// 										}).success(function(doing_items) {
-		// 											for (var i = 0; i < doing_items.length; i ++) {
-		// 												doing[i] = {
-		// 													id: doing_items[i].id,
-		// 													board_id: doing_items[i].board_id,
-		// 													container: doing_items[i].container,
-		// 													description: doing_items[i].description,
-		// 													label: doing_items[i].label
-		// 												}
-		// 											}
+					// Se obtienen los hijos directos del objeto (breadcrumbs)
+					models.GameObject.find({ parent: game_object.id }).exec(function(err, game_objects) {
+						if (err) {
+							console.log(err);
+						}
 
-		// 											// Se encuentran los items para cada contenedor del panel done
-		// 											models.BoardItem.findAll({
-		// 												where: {
-		// 													board_id: id,
-		// 													container: "done"
-		// 												}
-		// 											}).success(function(done_items) {
-		// 												for (var i = 0; i < done_items.length; i ++) {
-		// 													done[i] = {
-		// 														id: done_items[i].id,
-		// 														board_id: done_items[i].board_id,
-		// 														container: done_items[i].container,
-		// 														description: done_items[i].description,
-		// 														label: done_items[i].label
-		// 													}
-		// 												}
+						if (game_objects) {
+							for (var i = 0; i < game_objects.length; i++) {
+								children.push({
+									id: game_objects[i].id,
+									name: game_objects[i].name,
+									href: "/projects/" + project_name + "/panel/" + game_objects[i].id
+								});
+							}
+						}
 
-		// 												res.render('panel', { title: 'Prototipo - Panel', path: "/projects/" + project_name + "/panel/", crumbs: crumbs, children: children, object: response, files: object_files, extra: extra, todo: todo, doing: doing, done: done });
-		// 											});
-		// 										});
-		// 									});
-		// 								}
-		// 								else {
-		// 									// Asociar board al usuario
-		// 									models.Board.saveRecord({
-		// 										user_object_id: extra.user_object_id
-		// 									}, function(board) {
-		// 										extra.board_id = board.id;
-		// 										res.render('panel', { title: 'Prototipo - Panel', path: "/projects/" + project_name + "/panel/", crumbs: crumbs, children: children, object: response, files: object_files, extra: extra, todo: todo, doing: doing, done: done });
-		// 									});
-		// 								}
-		// 							});
-		// 						}
-		// 						else {
-		// 							res.render('panel', { title: 'Prototipo - Panel', path: "/projects/" + project_name + "/panel/", crumbs: crumbs, children: children, object: response, files: object_files, extra: extra, todo: todo, doing: doing, done: done });
-		// 						}
-		// 					}).error(function() {
-		// 						res.render('panel', { title: 'Prototipo - Panel', path: "/projects/" + project_name + "/panel/", crumbs: crumbs, children: children, object: response, files: object_files, extra: [], todo: todo, doing: doing, done: done });
-		// 					});
-		// 				}).error(function() {
-		// 					res.render('panel', { title: 'Prototipo - Panel', path: "/projects/" + project_name + "/panel/", crumbs: crumbs, children: [], object: response, files: object_files, extra: [], todo: todo, doing: doing, done: done });
-		// 				});
 
-		// 			}).error(function() {
-		// 				res.render('panel', { title: 'Prototipo - Panel', path: "/projects/" + project_name + "/panel/", crumbs: crumbs, children: [], object: response, files: [], extra: [], todo: todo, doing: doing, done: done });
-		// 			});
+						//  Se verifica si es que el usuario tiene el objeto asignado => información especial + archivos + todo panel
+						if (app.locals.user.objects.length) {
+							for (var i = 0; i < app.locals.user.objects.length; i++) {
+								if (app.locals.user.objects[i].game_object == game_object.id) {
+									extra.task = app.locals.user.objects[i].task;
+									extra.task_description = app.locals.user.objects[i].task_description;
+									extra.progress = app.locals.user.objects[i].progress;
+									extra.board_id = app.locals.user.objects[i].board;
+									break;
+								}
+							}
 
-		// 		})
-		// 	}).error(function() {
-		// 		res.send(404, "404");
-		// 	})
+							if (extra.board_id) {
+								// Se obtiene el board correspondiente
+								models.Board.findById(extra.board_id).exec(function(err, board) {
+									if (err) {
+										console.log(err);
+									}
+									if (!board) {
+										// Crear un board nuevo y asociarlo al usuario
+										var nuevo_board = new models.Board();
+										nuevo_board.save(function(err, nuevo) {
+											if (err) {
+												console.log(err);
+											}
+											if (nuevo) {
+												for (var i = 0; i < app.locals.user.objects.length; i++) {
+													if (app.locals.user.objects[i].game_object === game_object.id) {
+														app.locals.user.objects[i].board = nuevo.id;
+														break;
+													}
+												}
+												res.render('panel', { title: 'Prototipo - Panel', path: "/projects/" + project_name + "/panel/", crumbs: crumbs, children: children, object: response, files: game_object_files, extra: extra, todo: [], doing: [], done: [], flash: req.flash() });
+											}
+										});
+									}
+									else {
+										todo = (board.todo_items.length ? board.todo_items: []);
+										doing = (board.doing_items.length ? board.doing_items : []);
+										done = (board.done_items.length ? board.done_items : []);
+										res.render('panel', { title: 'Prototipo - Panel', path: "/projects/" + project_name + "/panel/", crumbs: crumbs, children: children, object: response, files: game_object_files, extra: extra, todo: todo, doing: doing, done: done, flash: req.flash() });
+									}
+								});
+							}
+							else {
+								console.log(children);
+								// Usuario con acceso readonly (no tiene asignado el objeto)
+								req.flash("info", "Acceso sólo de lectura");
+								res.render('panel', { title: 'Prototipo - Panel', path: "/projects/" + project_name + "/panel/", crumbs: crumbs, children: children, object: response, files: game_object_files, extra: {}, todo: [], doing: [], done: [], flash: req.flash() });
+							}
+						}
+						else {
+							// Usuario con acceso readonly (no tiene asignado el objeto)
+								req.flash("info", "Acceso sólo de lectura");
+								res.render('panel', { title: 'Prototipo - Panel', path: "/projects/" + project_name + "/panel/", crumbs: crumbs, children: children, object: response, files: game_game_object_files, extra: {}, todo: [], doing: [], done: [], flash: req.flash() });
+						}
+					});
+				}
+				else {
+					// El usuario no tiene acceso al objeto (proyecto)
+					req.flash("error", "No tiene acceso al proyecto");
+					res.redirect("/projects");
+				}
+			}
+		});
 	});
 
 	app.get("/download", function(req, res) {
@@ -828,12 +790,17 @@ module.exports = function(app, models) {
 		req.sanitize("roles").toInt();
 
 		req.assert("password", "La contraseña y su confimación no coinciden").equals(req.param("password_repeat"));
-		req.assert("email", "Email no válido").isEmail();
+
+		if (req.param("email")) {
+			req.assert("email", "Email no válido").isEmail();
+		}
 
 		var errors = [];
 		var temp = req.validationErrors();
-		for (var i = 0; i < temp.length; i++) {
-			errors.push(temp[i].msg)
+		if (temp) {
+			for (var i = 0; i < temp.length; i++) {
+				errors.push(temp[i].msg)
+			}
 		}
 
 		check_username(req.body.username, function(disponible) {
@@ -1133,7 +1100,13 @@ module.exports = function(app, models) {
 	app.get("/admin_panel/gameobjects/new", function(req, res) {
 		console.log("auth login");
 
-		var crumbs = []
+		var crumbs = [];
+		var projects = [];
+		var users = [];
+		var tasks = [];
+		var parents = [];
+		var errors = [];
+
 		crumbs[0] = {
 			name: "Administración",
 			href: "/admin_panel"
@@ -1149,28 +1122,53 @@ module.exports = function(app, models) {
 			href: "/admin_panel/gameobjects/new"
 		}
 
-		models.Project.find().exec(function(err, projects) {
-			if (err) {
-				console.log(err);
-				req.flash("error", err);
-				res.redirect("/admin_panel/gameobjects")
-			}
-			if (!projects) {
-				req.flash("error", "No se encontró ningún proyecto. Es necesario que exista uno previamente antes de crear un Game Object.");
-				res.redirect("/admin_panel/projects/new");
-			}
-			else {
-				models.GameObject.find().exec(function(err, parents) {
+		async.parallel({
+			projects: function(callback) {
+				models.Project.find().exec(function(err, response) {
 					if (err) {
 						console.log(err);
-						req.flash("error", err);
-						res.render("game_object_form", { title: "Administración - Crear Nuevo Game Object", parents: [], projects: projects, crumbs: crumbs, children: [], game_object: {}, flash: req.flash(), active: 3 });
+						callback(err);
 					}
-					if (!parents) {
-						res.render("game_object_form", { title: "Administración - Crear Nuevo Game Object", parents: [], projects: projects, crumbs: crumbs, children: [], game_object: {}, flash: req.flash(), active: 3 });
+					if (!response) {
+						callback("No se encontró ningún proyecto. Es necesario que exista uno previamente antes de crear un Game Object");
 					}
 					else {
-						res.render("game_object_form", { title: "Administración - Crear Nuevo Game Object", parents: parents, projects: projects, crumbs: crumbs, children: [], game_object: {}, flash: req.flash(), active: 3 });
+						callback(null, response);
+					}
+				});
+			},
+			users: function(callback) {
+				models.User.find().exec(function(err, response) {
+					if (err) {
+						console.log(err);
+						callback(err);
+					}
+					if (!response) {
+						callback(null, []);
+					}
+					else {
+						callback(null, response);
+					}
+				});
+			}
+		}, function(err, results) {
+			if (err) {
+				req.flash("error", err);
+			}
+			else  {
+				tasks.push("code");
+				tasks.push("music");
+				tasks.push("design");
+
+				models.GameObject.find({ project: results.projects[0] }).exec(function(err, parents) {
+					if (err) {
+						console.log(err);
+					}
+					if (!parents) {
+						res.render("game_object_form", { title: "Administración - Crear Nuevo Game Object", projects: results.projects, parents: [], users: results.users, tasks: tasks, crumbs: crumbs, children: [], game_object: {}, flash: req.flash(), active: 3 });
+					}
+					else {
+						res.render("game_object_form", { title: "Administración - Crear Nuevo Game Object", projects: results.projects, parents: parents, users: results.users, tasks: tasks, crumbs: crumbs, children: [], game_object: {}, flash: req.flash(), active: 3 });
 					}
 				});
 			}
@@ -1184,8 +1182,7 @@ module.exports = function(app, models) {
 		req.sanitize("parent");
 		req.sanitize("branch").trim();
 		req.sanitize("project");
-
-		console.log(req.body);
+		req.sanitize("user_id");
 
 		var game_object = new models.GameObject();
 		game_object.name = req.param("name");
@@ -1212,6 +1209,93 @@ module.exports = function(app, models) {
 			}
 			else {
 				req.flash("success", "Objeto creado correctamente");
+				if (req.param("user_id")) {
+					if (Array.isArray(req.param("user_id"))) {
+						// Se castea a ObjectId
+						var ids = [];
+						for (var i = 0; i < req.param("user_id").length; i++) {
+							ids.push(new mongoose.Types.ObjectId(req.param("user_id")[i]));
+						}
+						models.User.find().in("_id", ids).exec(function(err, users) {
+							if (err) {
+								console.log(err);
+							}
+							if (!users) {
+								req.flash("error", "El grupo de usuarios al que se le quiso asignar el Game Object no existe");
+							}
+							else {
+								var board = new models.Board();
+								board.save(function(err, nueva) {
+									if (err) {
+										console.log(err);
+									}
+									if (nueva) {
+										console.log("board creado " + users.length);
+										for (var i = 0; i < users.length; i++) {
+											var user = users[i];
+											var index = ids.indexOf(nuevo.id);
+											var temp = {
+												game_object : nuevo.id,
+												task: req.param("user_task")[index],
+												task_description : req.param("user_task_descr")[index],
+												board: nueva.id
+											}
+											var objects = [];
+											if (user.objects) {
+												objects = user.objects;
+											}
+											objects.push(temp);
+											user.objects = objects;
+											user.save(function(err, updated) {
+												if (err) {
+													console.log(err);
+												}
+											});
+										}
+									}
+								});
+							}
+						});
+					}
+					else {
+						var id = new mongoose.Types.ObjectId(req.param("user_id"));
+						models.User.findById(id).exec(function(err, user) {
+							if (err) {
+								console.log(err)
+							}
+							if (!user) {
+								req.flash("error", "El usuario al que se le quiso asignar el Game Object no existe");
+							}
+							else {
+								var board = new models.Board();
+								board.save(function(err, nueva) {
+									if (err) {
+										console.log(err);
+									}
+									if (nueva) {
+										var temp = {
+											game_object: nuevo.id,
+											task: req.param("user_task"),
+											task_description: req.param("user_task_descr"),
+											board: nueva.id
+										}
+										var objects = [];
+										if (user.objects) {
+											objects = user.objects;
+										}
+										objects.push(temp);
+										user.objects = objects;
+										user.save(function(err, updated) {
+											if (err) {
+												console.log(err);
+											}
+										});
+									}
+								});
+							}
+						})
+					}
+				}
 			}
 
 			res.redirect("/admin_panel/gameobjects/new");
@@ -1232,6 +1316,40 @@ module.exports = function(app, models) {
 				res.send(200, user.username);
 			}
 		});
+	});
+
+	app.post("/game_objects", function(req, res) {
+		// project_id
+		req.sanitize("project_id"),
+		models.GameObject.find({ project: req.param("project_id") }, "id name branch project").exec(function(err, game_objects) {
+			if (err) {
+				res.send(202, err);
+			}
+			if (!game_objects) {
+				res.send(200, []);
+			}
+			else {
+				var response = [];
+				for (var i = 0; i < game_objects.length; i++) {
+					response[i] = {
+						id: game_objects[i].id,
+						name: game_objects[i].name,
+						project: game_objects[i].project,
+						branch: ""
+					}
+
+					if (game_objects[i].branch) {
+						var branch = "";
+
+						for (var j = 0; j < game_objects[i].branch.length; j++) {
+							branch += game_objects[i].branch[j].toString() + " ";
+						}
+						response[i].branch = branch;
+					}
+				}
+				res.send(200, response);
+			}
+		})
 	});
 
 	app.get("*", function(req, res) {

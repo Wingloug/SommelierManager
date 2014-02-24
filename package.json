@@ -12,7 +12,6 @@
 		"nib": "*",
 		"connect-flash": "*",
 		"bcrypt-nodejs": "*",
-		"mysql":  "2.0.0-alpha7",
-		"sequelize": "*"
+		"async": "*"
 	}
 }

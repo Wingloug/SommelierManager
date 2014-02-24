@@ -2,17 +2,25 @@
 form(role="form", method="post", action="/admin_panel/gameobjects/new").form-horizontal
 	.form-group
 		label(for="name").control-label.col-md-3 Nombre
-		.col-md-5
+		.col-md-6
 			input(id="name", placeholder="Nombre", type="text", name="name", value=(game_object.name ? game_object.name : "")).form-control
 
 	.form-group
 		label(for="description").control-label.col-md-3 Descripción
-		.col-md-5
+		.col-md-6
 			textarea(id="description", name="description", value=(game_object.name ? game_object.name : "")).form-control
 
 	.form-group
+		label(for="project").control-label.col-md-3 Proyecto
+		.col-md-6
+			select(id="project", name="project").form-control
+				- for(var i = 0; i < projects.length; i++)
+					option(value=projects[i].id)= projects[i].name
+			input(id="hidden_project", name="project", type="hidden", disabled=true, value="")
+
+	.form-group
 		label(for="parent").control-label.col-md-3 Objeto Padre
-		.col-md-5
+		.col-md-6
 			select(id="parent", name="parent").form-control
 				option(value="", data-project="") Ninguno
 				- for(var i = 0; i < parents.length; i++)
@@ -20,17 +28,43 @@ form(role="form", method="post", action="/admin_panel/gameobjects/new").form-hor
 					- for (var j = 0; j < parents[i].branch.length; j++)
 						- branch += parents[i].branch[j].toString() + " "
 					option(value=parents[i].id, data-project=parents[i].project.toString(), data-branch=branch)= parents[i].name
-	input(id="branch", name="branch", type="hidden", value="");
-	.form-group
-		label(for="project").control-label.col-md-3 Proyecto
-		.col-md-5
-			select(id="project", name="project").form-control
-				- for(var i = 0; i < projects.length; i++)
-					option(value=projects[i].id)= projects[i].name
-			input(id="hidden_project", name="project", type="hidden", disabled=true, value="")
+	input(id="branch", name="branch", type="hidden", value="")
 
 	.form-group
-		.col-md-offset-3.col-md-5
+		label(for="users").control-label.col-md-3 Usuarios
+		.col-md-6
+			.help-block Usuarios que serán asignados al objeto
+			.users
+				.form-group
+					.col-md-offset-3.col-md-9
+						button(id="del_0", type="button", style="display: none").btn.btn-danger.btn-sm.pull-right Eliminar
+				.form-group
+					label.control-label.col-md-3 Usuario
+					.col-md-9
+						select(id="id_0", name="user_id").form-control
+							option(value="") Ninguno
+							- for (var i = 0; i < users.length; i++)
+								option(value=users[i].id)= users[i].username
+
+				.form-group
+					label.control-label.col-md-3 Tarea
+					.col-md-9
+						select(id="task_0", name="user_task", disabled).form-control
+							option(value="")
+							- for (var i = 0; i < tasks.length; i++)
+								option(value=tasks[i])= (tasks[i] === "code" ? "Código" : (tasks[i] === "music" ? "Música" : (tasks[i] === "design" ? "Diseño" : "")))
+
+				.form-group
+					label.control-label.col-md-3 Descripción tarea
+					.col-md-9
+						textarea(id="descr_0", name="user_task_descr", rows="4", disabled).form-control
+				hr
+			.form-group
+				.col-md-12
+					button(type="button", disabled)#add_user.btn.btn-default.pull-right Agregar Usuario
+
+	.form-group
+		.col-md-offset-3.col-md-6
 			button(type="submit").btn.btn-primary Guardar
 			a(href="/admin_panel/users").btn.btn-link Cancelar
 

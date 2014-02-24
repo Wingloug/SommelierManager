@@ -10,7 +10,7 @@ require("./config/server")(app, express);
 var models =  require(app.root + "/db/models")(app.root, mongoose);
 
 app.locals.user = {};
-var id = new mongoose.Types.ObjectId("52f84ef58f6a11cf3a28473d");
+var id = new mongoose.Types.ObjectId("530a79d61e619f6037b5c28f");
 models.User.findById(id).exec(function(err, response) {
 	// app.user.id = response.id;
 	// app.user.username = response.username;

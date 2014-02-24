@@ -10,7 +10,7 @@ block content
 				ul.list-inline
 					li: a(href="/projects/" + projects[i].name)= projects[i].name
 					li: span(class="label " + (projects[i].status == "active" ? "label-primary" : (projects[i].status == "paused" ? "label-warning" : "label-success")))= projects[i].status
-					h5: small Progress
+					h5: small Progreso
 					div(style="width: 30%").progress
 						div(id="progress_" + projects[i].id role="progressbar", aria-valuenow= projects[i].progress, aria-valuemin="0", aria-valuemax="100", style="width: 0%; max-width: " + projects[i].progress + "%").progress-bar.progress-bar-info
 							span.sr-only= projects[i].progress + "% complete"
