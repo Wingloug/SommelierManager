@@ -1,7 +1,7 @@
 $(function() {
 	var options = {
 		valueNames: [ 'username' , 'email', 'role' ],
-		page: 10,
+		page: 8,
 		plugins: [ ListPagination({}) ]
 	}
 

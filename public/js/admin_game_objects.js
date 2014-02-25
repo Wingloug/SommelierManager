@@ -1,7 +1,7 @@
 $(function() {
 	var options = {
 		valueNames: [ 'name' , 'parent', 'project'],
-		page: 6,
+		page: 8,
 		plugins: [ ListPagination({}) ]
 	}
 

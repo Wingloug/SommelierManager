@@ -14,6 +14,18 @@ module.exports = function(app, express) {
 			.use(nib());
 	}
 
+	mongoose.connect('mongodb://localhost/prototipo_dev');
+	var db = mongoose.connection;
+	var id = new mongoose.Types.ObjectId("530a79d61e619f6037b5c28f");
+
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function callback () {
+		var models =  require(app.root + "/db/models")(app.root, mongoose);
+		require("./locals")(app, mongoose, models);
+		// Rutas
+		require("./routes")(app, models);
+	});
+
 	app.configure('development', function() {
 		app.set('port', process.env.PORT || 3000);
 		app.set('views', app.root + '/views');
@@ -38,6 +50,13 @@ module.exports = function(app, express) {
 		}));
 		app.use(express.static(app.root + '/public'));
 		app.use(flash());
+		app.use(function (req, res, next) {
+			res.locals.flash = function() {
+				var messages = req.flash();
+				return messages;
+			}
+			next();
+		});
 		app.use(app.router);
 		app.use(express.errorHandler());
 	});
@@ -54,15 +73,15 @@ module.exports = function(app, express) {
 		var oneYear = 31557600000;
 		app.use(express.static(app.root + '/public'), { maxAge: oneYear });
 		app.use(flash());
+		app.use(function (req, res, next) {
+			res.locals.flash = function() {
+				var messages = req.flash();
+				return messages;
+			}
+			next();
+		});
 		app.use(app.router);
 		app.use(express.methodOverride());
 		app.use(express.errorHandler());
-	});
-
-	mongoose.connect('mongodb://localhost/prototipo_dev');
-	var db = mongoose.connection;
-
-	db.on('error', console.error.bind(console, 'connection error:'));
-	db.once('open', function callback () {
 	});
 };

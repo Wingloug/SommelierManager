@@ -7,7 +7,16 @@ nav(role="navigation").navbar.navbar-default
 			span.icon-bar
 		a(href="/projects").navbar-brand Prototipo
 
-		#main_menu.collapse.navbar-collapse.navbar-right
+		#main_menu.collapse.navbar-collapse
 			ul.nav.navbar-nav
-				li.active: a(href="/projects") Proyectos
-				li: a Usuarios
+				li.dropdown
+					a(href="#", data-toggle="dropdown").dropdown-toggle Administración&nbsp;
+						b.caret
+					ul.dropdown-menu
+						li(class=(active === 0 ? "active" : "")): a(href="/admin_panel/users") Usuarios
+						li(class=(active === 1 ? "active" : "")): a(href="/admin_panel/projects") Proyectos
+						li(class=(active === 2 ? "active" : "")): a(href="/admin_panel/gameobjects") Game Objects
+
+			ul.nav.navbar-nav.navbar-right
+				li: a(href="/projects") Proyectos
+				li: a(href="#")= user.username
