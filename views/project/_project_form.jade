@@ -25,12 +25,15 @@ form(role="form", method="post", action="/admin_panel/projects/new").form-horizo
 		.col-md-5
 			select(id="users", type="text", multiple, data-placeholder="Usuarios", name="users").form-control
 				- for(var i = 0; i < users.length; i++)
-					option(value=users[i].id)= users[i].username
+					- if (users[i].projects.indexOf(project._id) >= 0)
+						option(value=users[i].id, selected=true)= users[i].username
+					- else
+						option(value=users[i].id)= users[i].username
 			.help-block Usuarios que tendrán acceso a ver los objetos del proyecto
 
 	.form-group
 		.col-md-offset-3.col-md-5
 			button(type="submit").btn.btn-primary Guardar
-			a(href="/admin_panel/users").btn.btn-link Cancelar
+			a(href="/admin_panel/projects").btn.btn-link Cancelar
 
 script(src="/js/project_form.js", async)

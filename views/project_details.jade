@@ -6,19 +6,4 @@ block content
 	include layout/_breadcrumbs
 	include _flash
 
-	h4= project.name
-	dl
-		dt Progreso
-		dd
-			div(style="width: 40%; margin-bottom: 0; display: inline-block; vertical-align: bottom").progress
-				div(id="progress_" + project.id role="progressbar", aria-valuenow= project.progress, aria-valuemin="0", aria-valuemax="100", style="width: " + project.progress + "%").progress-bar.progress-bar-info
-			div= project.progress + " %"
-		dt= "Estado "
-			span(class=(project.status === "active" ? "label label-primary" : project.status === "paused" ? "label label-warning" : "label label-danger"))= (project.status === "active" ? "Activo" : project.status === "paused" ? "Pausado" : "Finalizado")
-		dt Creado por
-			dd= project.created_by.username
-		dt Usuarios con permiso de acceso
-		dd
-			ul
-				- for(var i = 0; i < users.length; i++)
-					li= users[i].username
+	include project/_project_details

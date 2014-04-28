@@ -337,13 +337,21 @@ module.exports = function(app, models) {
 
 	app.get("/download", function(req, res) {
 		// ?path=/project_files/project/filename&filename=original_filename
-		var path = req.query.path;
-		var filename = req.query.filename;
+		req.sanitize("path");
+		req.sanitize("filename");
+		var path = req.param('path');
+		var filename = req.param("filename");
+
 		res.download(app.root + "/public" + path, filename, function(err) {
 			if(err) {
 				res.send(404, "Archivo no encontrado");
 			}
 		});
+	});
+
+	app.post("/upload", function(req, res) {
+		console.log(req.files);
+		res.send(200);
 	});
 
 	app.post("/create_update_item", function(req, res) {
@@ -1100,7 +1108,7 @@ module.exports = function(app, models) {
 		});
 
 		app.locals.crumbs.push({
-			name: "Detalle proyecto",
+			name: "Detalle proyecto <strong>" + req.param("name") + "</strong>",
 			href: "/admin_panel/projects/" + req.param("id")
 		});
 
@@ -1133,6 +1141,61 @@ module.exports = function(app, models) {
 				});
 			}
 		});
+	});
+
+	app.get("/admin_panel/projects/edit/:name", function(req, res) {
+		console.log("auth login");
+		var statuses = [];
+
+		// Reiniciar crumbs, children
+		app.locals.crumbs = [];
+		app.locals.children = [];
+		app.locals.crumbs.push({
+			name: "Proyectos",
+			href:"/admin_panel/projects/"
+		});
+
+		app.locals.crumbs.push({
+			name: "Editar proyecto <strong>" + req.param("name") + "</strong>",
+			href: "/admin_panel/projects/edit/" + req.param("name")
+		});
+
+		var statuses = [];
+		statuses[0] = "Activo";
+		statuses[1] = "Pausado";
+		statuses[2] = "Completado";
+
+		models.Project.findOne({ name: req.param("name") }).populate("created_by").exec(function(err, project) {
+			if (err) {
+				console.log(err);
+				req.flash("error", "Se ha producido un error. Inténtelo nuevamente");
+				res.redirect("/admin_panel/projects");
+				// res.send(500, err);
+			}
+
+			if (!project) {
+				console.log("Proyecto no encontrado");
+				req.flash("error", "El proyecto no fue encontrado");
+				res.redirect("/admin_panel/projects");
+				// res.send(500, err);
+			}
+			else {
+				models.User.find().exec(function(err, users) {
+					if (err) {
+						console.log(err);
+						req.flash("error", err);
+						res.render("project_form", { title: "Administración - Editar proyecto", project: project, users: [], statuses: statuses, active: 1 });
+					}
+					if (!users) {
+						res.render("project_form", { title: "Administración - Editar proyecto", project: project, users: [], statuses: statuses, active: 1 });
+					}
+					else {
+						res.render("project_form", { title: "Administración - Editar proyecto", project: project, users: users, statuses: statuses, active: 1 });
+					}
+				});
+			}
+		});
+
 	});
 
 	app.get("/admin_panel/gameobjects", function(req, res) {

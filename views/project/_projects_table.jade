@@ -5,6 +5,7 @@
 	table.table.table-stripped.table-bordered.table-hover#projects_table
 		thead
 			tr
+				th
 				th Nombre
 					div.sorters
 						a(class="sortAsc", data-sort="name")
@@ -29,17 +30,24 @@
 							span.glyphicon.glyphicon-chevron-up
 						a(class="sortDesc", data-sort="username")
 							span.glyphicon.glyphicon-chevron-down
+				th
 		tbody.list
 			- if (projects.length)
 				- for (var i = 0; i < projects.length; i++)
 					tr
-						td: a(href="/admin_panel/projects/" + projects[i].name, class="name")= projects[i].name
+						td.table-acciones: input(name="delete-"+projects[i].id, type="checkbox")
+						td: a(href="/admin_panel/projects/" + projects[i].name, class="name details")= projects[i].name
 						td
 							small(class="progreso")= projects[i].progress + " %"
 							.progress
 								div(id="progress_" + projects[i].id role="progressbar", aria-valuenow= projects[i].progress, aria-valuemin="0", aria-valuemax="100", style="width: " + projects[i].progress + "%").progress-bar.progress-bar-info
 						td(class="status")= projects[i].status
 						td(class="username", data-user=projects[i].created_by.id)= projects[i].created_by.username
+						td.table-acciones
+							.btn-group.btn-group-xs
+								a(href="/admin_panel/projects/edit/" + projects[i].name).btn.btn-default
+									i.glyphicon.glyphicon-pencil
+									|  Editar
 			- else
 				tr: td(colspan="4").text-center Proyectos no encontrados
 
