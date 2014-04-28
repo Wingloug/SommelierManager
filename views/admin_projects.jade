@@ -6,7 +6,10 @@ block content
 
 	p.pull-right
 		a(href="/admin_panel/projects/new")
-			i.glyphicon.glyphicon-plus Agregar
+			i.glyphicon.glyphicon-plus
+			|  Agregar
 	include project/_projects_table
+
+	#details_container
 
 	script(src="/js/admin_projects.js", type="text/javascript", async)

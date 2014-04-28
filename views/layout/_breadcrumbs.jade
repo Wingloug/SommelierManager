@@ -3,7 +3,7 @@ ol.breadcrumb
 	- for (i = 0; i < crumbs.length - 1; i++)
 		li: a(href= crumbs[i].href)= crumbs[i].name
 	-if (i || crumbs.length === 1)
-		li.active= crumbs[i].name
+		li.active!= crumbs[i].name
 		- if (children.length)
 			div(style="display: inline; margin-left: 0.5em").dropdown
 				a(data-toggle="dropdown").dropdown-toggle
