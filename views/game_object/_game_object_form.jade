@@ -8,14 +8,18 @@ form(role="form", method="post", action="/admin_panel/gameobjects/new").form-hor
 	.form-group
 		label(for="description").control-label.col-md-3 Descripción
 		.col-md-6
-			textarea(id="description", name="description", value=(game_object.name ? game_object.name : "")).form-control
+			textarea(id="description", name="description").form-control
+				= game_object.description ? game_object.description : ""
 
 	.form-group
 		label(for="project").control-label.col-md-3 Proyecto
 		.col-md-6
 			select(id="project", name="project").form-control
 				- for(var i = 0; i < projects.length; i++)
-					option(value=projects[i].id)= projects[i].name
+					- if (game_object.project == projects[i].id)
+						option(value=projects[i].id, selected=true)= projects[i].name
+					- else
+						option(value=projects[i].id)= projects[i].name
 			input(id="hidden_project", name="project", type="hidden", disabled=true, value="")
 
 	.form-group
@@ -34,34 +38,74 @@ form(role="form", method="post", action="/admin_panel/gameobjects/new").form-hor
 		label(for="users").control-label.col-md-3 Usuarios
 		.col-md-6
 			.help-block Usuarios que serán asignados al objeto
-			.users
-				.form-group
-					.col-md-offset-3.col-md-9
-						button(id="del_0", type="button", style="display: none").btn.btn-danger.btn-sm.pull-right Eliminar
-				.form-group
-					label.control-label.col-md-3 Usuario
-					.col-md-9
-						select(id="id_0", name="user_id").form-control
-							option(value="") Ninguno
-							- for (var i = 0; i < users.length; i++)
-								option(value=users[i].id)= users[i].username
+			- if (assigned_users)
+				- for (var j = 0; j < assigned_users.length; j++)
+					- for (var k = 0; k < assigned_users[j].objects.length; k++)
+						- if (assigned_users[j].objects[k].game_object == game_object.id)
+							.users
+								.form-group
+									.col-md-offset-3.col-md-9
+										button(id="del_0", type="button").btn.btn-danger.btn-sm.pull-right Eliminar
+								.form-group
+									label.control-label.col-md-3 Usuario
+									.col-md-9
+										select(id="id_0", name="user_id").form-control
+											option(value="") Ninguno
+											- for (var i = 0; i < users.length; i++)
+												-if (users[i].id == assigned_users[j].id)
+													option(value=users[i].id, selected=true)= users[i].username
+												- else
+													option(value=users[i].id)= users[i].username
 
-				.form-group
-					label.control-label.col-md-3 Tarea
-					.col-md-9
-						select(id="task_0", name="user_task", disabled).form-control
-							option(value="")
-							- for (var i = 0; i < tasks.length; i++)
-								option(value=tasks[i])= (tasks[i] === "code" ? "Código" : (tasks[i] === "music" ? "Música" : (tasks[i] === "design" ? "Diseño" : "")))
+								.form-group
+									label.control-label.col-md-3 Tarea
+									.col-md-9
+										select(id="task_0", name="user_task").form-control
+											option(value="")
+											- for (var i = 0; i < tasks.length; i++)
+												- if (tasks[i] == assigned_users[j].objects[k].task)
+													option(value=tasks[i], selected=true)= (tasks[i] === "code" ? "Código" : (tasks[i] === "music" ? "Música" : (tasks[i] === "design" ? "Diseño" : "")))
+												- else
+													option(value=tasks[i])= (tasks[i] === "code" ? "Código" : (tasks[i] === "music" ? "Música" : (tasks[i] === "design" ? "Diseño" : "")))
 
-				.form-group
-					label.control-label.col-md-3 Descripción tarea
-					.col-md-9
-						textarea(id="descr_0", name="user_task_descr", rows="4", disabled).form-control
+								.form-group
+									label.control-label.col-md-3 Descripción tarea
+									.col-md-9
+										textarea(id="descr_0", name="user_task_descr", rows="4").form-control
+											= assigned_users[j].objects[k].task_description
+								hr
+								.form-group
+									.col-md-12
+										button(type="button")#add_user.btn.btn-default.pull-right Agregar Usuario
+			- else
+				.users
+					.form-group
+						.col-md-offset-3.col-md-9
+							button(id="del_0", type="button", style="display: none").btn.btn-danger.btn-sm.pull-right Eliminar
+					.form-group
+						label.control-label.col-md-3 Usuario
+						.col-md-9
+							select(id="id_0", name="user_id").form-control
+								option(value="") Ninguno
+								- for (var i = 0; i < users.length; i++)
+									option(value=users[i].id)= users[i].username
+
+					.form-group
+						label.control-label.col-md-3 Tarea
+						.col-md-9
+							select(id="task_0", name="user_task", disabled).form-control
+								option(value="")
+								- for (var i = 0; i < tasks.length; i++)
+									option(value=tasks[i])= (tasks[i] === "code" ? "Código" : (tasks[i] === "music" ? "Música" : (tasks[i] === "design" ? "Diseño" : "")))
+
+					.form-group
+						label.control-label.col-md-3 Descripción tarea
+						.col-md-9
+							textarea(id="descr_0", name="user_task_descr", rows="4", disabled).form-control
 				hr
-			.form-group
-				.col-md-12
-					button(type="button", disabled)#add_user.btn.btn-default.pull-right Agregar Usuario
+				.form-group
+					.col-md-12
+						button(type="button", disabled)#add_user.btn.btn-default.pull-right Agregar Usuario
 
 	.form-group
 		.col-md-offset-3.col-md-6

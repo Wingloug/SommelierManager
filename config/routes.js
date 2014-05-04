@@ -1429,6 +1429,116 @@ module.exports = function(app, models) {
 		});
 	});
 
+	app.get("/admin_panel/gameobjects/edit/:id", function(req, res) {
+		req.sanitize("id");
+		console.log("auth login");
+
+		var projects = [];
+		var users = [];
+		var tasks = [];
+		var parents = [];
+		var errors = [];
+
+		// Reiniciar crumbs, children
+		app.locals.crumbs = [];
+		app.locals.children = [];
+		app.locals.crumbs.push({
+			name: "Game Objects",
+			href:"/admin_panel/gameobjects/"
+		});
+
+		app.locals.crumbs.push({
+			name: "Nuevo game object",
+			href: "/admin_panel/gameobjects/new"
+		});
+
+		models.GameObject.findOne({ _id: req.param("id") }).exec(function(err, game_object) {
+			if (err) {
+				console.log(err);
+				req.flash("error", "Se ha producido un error. Inténtelo nuevamente");
+				return res.redirect("/admin_panel/gameobjects");
+			}
+
+			if (!game_object) {
+				console.log("Game Object no encontrado");
+				req.flash("error", "El game object no fue encontrado");
+				res.redirect("/admin_panel/gameobjects");
+			}
+			else {
+				async.parallel({
+					projects: function(callback) {
+						models.Project.find().exec(function(err, response) {
+							if (err) {
+								console.log(err);
+								callback(err);
+							}
+							if (!response) {
+								callback("No se encontró ningún proyecto. Es necesario que exista uno asociado al Game Object");
+							}
+							else {
+								callback(null, response);
+							}
+						});
+					},
+					users: function(callback) {
+						models.User.find().exec(function(err, response) {
+							if (err) {
+								console.log(err);
+								callback(err);
+							}
+							if (!response) {
+								callback(null, []);
+							}
+							else {
+								callback(null, response);
+							}
+						});
+					},
+					assigned_users: function(callback) {
+						models.User.find({ 'objects.game_object': req.param("id") }).exec(function(err, response) {
+							if (err) {
+								console.log(err);
+								callback(err);
+							}
+							if (!response) {
+								callback(null, []);
+							}
+							else {
+								console.log('-------' + response.length);
+								callback(null, response);
+							}
+						});
+					}
+				}, function(err, results) {
+					if (err) {
+						req.flash("error", err);
+					}
+					else  {
+						tasks.push("code");
+						tasks.push("music");
+						tasks.push("design");
+
+						models.GameObject.find({ project: game_object.project }).where('_id').ne(req.param("id")).exec(function(err, parents) {
+							if (err) {
+								console.log(err);
+							}
+							if (!parents) {
+								res.render("game_object_form", { title: "Administración - Editar Game Object", projects: results.projects, parents: [], users: results.users, tasks: tasks,  assigned_users: results.assigned_users,game_object: game_object, active: 2 });
+							}
+							else {
+								res.render("game_object_form", { title: "Administración - Editar Game Object", projects: results.projects, parents: parents, users: results.users, tasks: tasks, assigned_users: results.assigned_users, game_object: game_object, active: 2 });
+							}
+						});
+					}
+				});
+			}
+		});
+	});
+
+	app.post("/admin_panel/gameobjects/delete/:id", function(req, res) {
+
+	});
+
 	app.post("/username/:id", function(req, res) {
 		req.sanitize("id");
 		var id = new mongoose.Types.ObjectId(req.param("id"));

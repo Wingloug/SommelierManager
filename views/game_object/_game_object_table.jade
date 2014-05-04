@@ -2,9 +2,15 @@
 	div(style="margin-bottom: 0.8em").form-inline
 		input(type="text", placeholder="Buscar", style="width: 12em; margin-right: 0.4em").search.form-control
 		button(type="button").btn.btn-default Limpiar
+
+		button(type="button").btn.btn-default.btn-sm.pull-right
+			i.glyphicon.glyphicon-trash
+			|  Eliminar
+
 	table.table.table-stripped.table-bordered.table-hover
 		thead
 			tr
+				th
 				th Nombre
 					div.sorters
 						a(class="sortAsc", data-sort="name")
@@ -23,13 +29,20 @@
 							span.glyphicon.glyphicon-chevron-up
 						a(class="sortDesc", data-sort="role")
 							span.glyphicon.glyphicon-chevron-down
+				th Acciones
 		tbody.list
 			-if (game_objects.length)
 				- for (var i = 0; i < game_objects.length; i++)
 					tr
+						td.table-acciones: input(name="delete-"+game_objects[i].id, type="checkbox")
 						td(class="name")= game_objects[i].name
 						td(class="parent")= (game_objects[i].parent ? game_objects[i].parent.name : "")
 						td(class="project")= game_objects[i].project.name
+						td.table-acciones
+							.btn-group.btn-group-xs
+								a(href="/admin_panel/gameobjects/edit/" + game_objects[i].id).btn.btn-default
+									i.glyphicon.glyphicon-pencil
+									|  Editar
 			- else
 				tr: td(colspan=5).text-center Objetos no encontrados
 

@@ -5,6 +5,7 @@ button.btn:focus,a:focus{outline:0}
 .hide{display:none}
 .download_file{font-size:2em;color:#333;}
 .download_file:hover{color:#777}
+.chosen-container-multi .chosen-choices li.search-field input[type="text"]{height:auto}
 .alert-default{border-color:#ddd}
 .item-label{cursor:pointer;}
 .item-label.default{color:#ccc;}

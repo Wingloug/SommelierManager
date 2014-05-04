@@ -1,7 +1,6 @@
 (function() {
 	$("#del_0").click(function(e) {
 		var index = $(this).attr("id").split("_")[1];
-		console.log(index);
 		if (index > 0) {
 			$(this).parents(".users").remove();
 		}
@@ -66,8 +65,8 @@
 	});
 
 	$("#parent").change(function() {
-		var project = $(this).children("option:selected").attr("data-project");
-		var branch = $(this).children("option:selected").attr("data-branch");
+		var project = $(this).children("option:selected").data("project");
+		var branch = $(this).children("option:selected").data("branch");
 
 		if (project) {
 			$("#project").children("option[value='" + project + "']").prop("selected", true);
@@ -86,18 +85,18 @@
 	var game_objects = [];
 
 	$("#project").children("option").each(function() {
-		game_objects[$(this).attr("value")] = [];
+		game_objects[$(this).prop("value")] = [];
 	});
 
 	$("#parent").children("option").each(function() {
-		var project_id = $("#project").children("option:selected").attr("value");
-		if ($(this).attr("value")) {
-			game_objects[project_id].push({ id: $(this).attr("value"), name: $(this).text(), branch: $(this).attr("data-branch") });
+		var project_id = $("#project").children("option:selected").prop("value");
+		if ($(this).prop("value")) {
+			game_objects[project_id].push({ id: $(this).prop("value"), name: $(this).text(), branch: $(this).data("branch") });
 		}
-	})
+	});
 
 	$("#project").change(function() {
-		var project_id = $(this).children("option:selected").attr("value");
+		var project_id = $(this).children("option:selected").prop("value");
 		$("#parent").children("option").remove();
 
 		if (game_objects[project_id].length) {
