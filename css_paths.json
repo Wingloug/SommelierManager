@@ -1,6 +1,7 @@
 {
 	"css": [
 		"bower_components/bootstrap/dist/css/bootstrap.css",
+		"bower_components/bootstrap/dist/css/bootstrap.css.map",
 		"bower_components/chosen/chosen-sprite.png",
 		"bower_components/chosen/chosen-sprite@2x.png",
 		"bower_components/chosen/chosen.css"

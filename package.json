@@ -1,17 +1,28 @@
 {
-	"name": "application-name",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"start": "node app.js"
-	},
-	"dependencies": {
-		"express": "3.4.8",
-		"jade": "*",
-		"stylus": "*",
-		"nib": "*",
-		"connect-flash": "*",
-		"bcrypt-nodejs": "*",
-		"async": "*"
-	}
+  "name": "application-name",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.4.8",
+    "jade": "*",
+    "stylus": "*",
+    "nib": "*",
+    "connect-flash": "*",
+    "bcrypt-nodejs": "*",
+    "async": "*"
+  },
+  "devDependencies": {
+    "gulp": "~3.6.2",
+    "gulp-concat": "2.2.x",
+    "gulp-gzip": "0.0.x",
+    "gulp-tar": "0.3.x",
+    "gulp-uglify": "0.2.x",
+    "gulp-minify-css": "0.3.x",
+    "gulp-imagemin": "0.3.x",
+    "gulp-load-plugins": "0.5.x",
+    "gulp-clean": "0.2.x"
+  }
 }
