@@ -23,6 +23,9 @@ module.exports = function(app, express) {
 		var models =  require(app.root + "/db/models")(app.root, mongoose);
 		require("./locals")(app, mongoose, models);
 		// Rutas
+		require("./routes_admin-users")(app, models);
+		require("./routes_admin-projects")(app, models);
+		require("./routes_admin-gameobjects")(app, models);
 		require("./routes")(app, models);
 	});
 
