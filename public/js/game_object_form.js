@@ -37,7 +37,7 @@
 	});
 
 	$("#add_user").click(function(e) {
-		if ($(".users select:first").prop("value")) {
+		if ($(".users select:first option:selected").val()) {
 			var form = $(".users:last").clone(true);
 			var index = 	parseInt(form.find("select:first").attr("id").split("_")[1]);
 			index++;
@@ -59,9 +59,9 @@
 			}
 
 			task.prop("disabled", false);
-			descr.prop("disabled", false);
+			descr.prop("disabled", false).val("");
 
-			$(this).before(form);
+			$('.users:last').after(form);
 		}
 	});
 
