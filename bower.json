@@ -1,0 +1,27 @@
+{
+  "name": "Prototipo",
+  "version": "0.1.1",
+  "homepage": "https://github.com/Wingloug/SommelierManager",
+  "authors": [
+    "Daniela Muñoz <dani.munozp@gmail.com>"
+  ],
+  "description": "Manager de game objects",
+  "main": "app.js",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "2.1.1",
+    "list.pagination.js": "~0.1.1",
+    "listjs": "~1.0.2",
+    "jcarousel": "0.3.1",
+    "chosen": "https://github.com/harvesthq/chosen/releases/download/v1.1.0/chosen_v1.1.0.zip",
+    "bootstrap": "3.1.1"
+  }
+}

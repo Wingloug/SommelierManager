@@ -1,0 +1,14 @@
+{
+	"css": [
+		"bower_components/bootstrap/dist/css/bootstrap.css",
+		"bower_components/chosen/chosen-sprite.png",
+		"bower_components/chosen/chosen-sprite@2x.png",
+		"bower_components/chosen/chosen.css"
+	],
+	"fonts": [
+		"bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.eot",
+		"bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.svg",
+		"bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf",
+		"bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.woff"
+	]
+}

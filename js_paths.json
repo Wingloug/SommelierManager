@@ -1,0 +1,9 @@
+[
+	"bower_components/jquery/dist/jquery.js",
+	"bower_components/list.pagination.js/dist/list.pagination.js",
+	"bower_components/listjs/dist/list.js",
+	"bower_components/bootstrap/dist/js/bootstrap.js",
+	"bower_components/chosen/chosen.jquery.js",
+	"bower_components/jcarousel/dist/jquery.jcarousel.js",
+	"bower_components/jcarousel/examples/connected-carousels/jcarousel.connected-carousels.js"
+]
